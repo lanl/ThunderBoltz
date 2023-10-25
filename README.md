@@ -22,7 +22,7 @@ of the EEDF) due to collisions with a stationary neutral background.
 Clone a local repository with the code. You may need to set up
 SSH keys in order to access gitlab. See [here](https://docs.gitlab.com/ee/user/ssh.html).
 ```
-git clone git@gitlab.com/Mczammit/thunderboltz.git
+git clone https://github.com/lanl/ThunderBoltz.git
 ```
 The basic ThunderBoltz functionality will be available either
 as an executable in `bin/thunderboltz.bin` or can be compiled from the
