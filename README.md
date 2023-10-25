@@ -11,8 +11,8 @@ track electron transport (either via trajectories in the MC case, or through mod
 of the EEDF) due to collisions with a stationary neutral background.
 
 ## Manuals
-The ThunderBoltz C++ source code manual is found in the home directory >tb_manual.pdf>,
-and the Python API code manual is found in the home directory pytb_manual.pdf.
+The ThunderBoltz C++ source code manual is found in the home directory "tb_manual.pdf",
+and the Python API code manual is found in the home directory "pytb_manual.pdf".
 
 ## Installation
 
