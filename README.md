@@ -1,9 +1,4 @@
 # ThunderBoltz
-Direct simulation Monte Carlo ThunderBoltz C++ and Python API codes 
-
-
-
-# ThunderBoltz
 
 ThunderBoltz is a 0D Direct Simulation Monte-Carlo code for the calculation of transport
 coefficients and 0D gas modeling. This repository contains the ThunderBoltz C++ source code (C22063)
