@@ -6,10 +6,10 @@ Direct simulation Monte Carlo ThunderBoltz C++ and Python API codes
 # ThunderBoltz
 
 ThunderBoltz is a 0D Direct Simulation Monte-Carlo code for the calculation of transport
-coefficients and 0D gas modeling. This repositroy contains the ThunderBoltz C++ source code (C22063)
-and ThunderBoltz Python API code (O4674), which fall under a GPL v3 license. 
+coefficients and 0D gas modeling. This repository contains the ThunderBoltz C++ source code (C22063)
+and ThunderBoltz Python API code (O4674), which are released with a GPL v3 license. 
 The overarching goal of this project is to provide
-transport coefficients for both electrons and ions, and to model energytransfer
+transport coefficients for electrons, ions and neutrals, and to model energy transfer
 between charged particles and neutral gases. These processes are not modeled by
 commonly used Boltzmann solvers such as Bolsig+ or MagBoltz since these solvers only
 track electron transport (either via trajectories in the MC case, or through modeling
