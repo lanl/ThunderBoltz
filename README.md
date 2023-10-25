@@ -10,6 +10,10 @@ commonly used Boltzmann solvers such as Bolsig+ or MagBoltz since these solvers 
 track electron transport (either via trajectories in the MC case, or through modeling
 of the EEDF) due to collisions with a stationary neutral background.
 
+## Manuals
+The ThunderBoltz C++ source code manual is found in the home directory ``tb_manual.pdf",
+and the Python API code manual is found in the home directory ``pytb_manual.pdf".
+
 ## Installation
 
 ### Clone the repository
