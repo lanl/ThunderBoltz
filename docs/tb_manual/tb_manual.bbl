@@ -1,0 +1,31 @@
+\begin{thebibliography}{1}
+
+\bibitem{CHUNG20053}
+H.-K. Chung, M.H. Chen, W.L. Morgan, Y.~Ralchenko, and R.W. Lee.
+\newblock Flychk: Generalized population kinetics and spectral model for rapid
+  spectroscopic analysis for all elements.
+\newblock {\em High Energy Density Physics}, 1(1):3--12, 2005.
+
+\bibitem{donko2021}
+Zolt{\'a}n Donk{\'o}, Aranka Derzsi, M{\'a}t{\'e} Vass, Benedek Horv{\'a}th,
+  Sebastian Wilczek, Botond Hartmann, and Peter Hartmann.
+\newblock edupic: an introductory particle based code for radio-frequency
+  plasma simulation.
+\newblock {\em Plasma Sources Science and Technology}, 30(9):095017, 2021.
+
+\bibitem{Hagelaar_2005}
+G~J~M Hagelaar and L~C Pitchford.
+\newblock Solving the boltzmann equation to obtain electron transport
+  coefficients and rate coefficients for fluid models.
+\newblock {\em Plasma Sources Science and Technology}, 14(4):722--733, oct
+  2005.
+
+\bibitem{Park_2022}
+Ryan~M Park, Willem Kupets, Mark~C Zammit, James Colgan, Christopher~J Fontes,
+  Brett~S Scheiner, Eddy Timmermans, Xian-Zhu Tang, Liam~H Scarlett, Dmitry~V
+  Fursa, Igor Bray, and Nathan~A Garland.
+\newblock Anisotropic angular scattering models of elastic electron-neutral
+  collisions for monte carlo plasma simulations.
+\newblock {\em Plasma Sources Science and Technology}, 31(6):065013, jul 2022.
+
+\end{thebibliography}

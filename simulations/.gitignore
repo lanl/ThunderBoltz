@@ -1,0 +1,8 @@
+# Ignore everything but this file
+*
+!.gitignore
+# Unless its csv data
+!*.csv
+# Or pdf figures
+!*.pdf
+

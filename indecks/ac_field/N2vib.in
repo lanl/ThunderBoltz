@@ -1,0 +1,62 @@
+CC "Comment lines start with CC and have comment in quotes"
+CC "Length of Box"
+L 1e-6
+CC "Particle Species Information"
+CC "------------------------------"
+CC "number of species {SP}"
+SP 4
+CC "number of particles for each species {NP}"
+CC "NP 101250 135000 "
+NP 6000 10000 0 0 
+CC "temperature of each particle species"
+TP  1.0 0.0 0.0 0.0
+CC "flow velocity"
+VV 50.0 0.0 0.0 0.0
+CC "Charge of each particle species"
+QP -1.0 0.0 0.0 0.0
+CC "Mass of each particle species"
+MP 5.4857e-4 28.0 28.0 28.0
+CC "-----------------------------"
+NS 33001
+VS 1000
+DT 1.0e-11
+CC "note -10000V is 100Td, -100V is 1Td"
+E -5000.0
+ET 10000000
+CC "0.001 = 10Hx"
+B 0.0 0.00 0.0
+CC " Collision Model Specification "
+CC "----------------------"
+CC "List cross sections first start with {CS}"
+CS cross_sections/1.dat 0 1 ElasticFixedParticle2 0.0 0 1
+CS cross_sections/v01.dat 0 1 InelasticChangeParticle2 0.275 0 2
+CS cross_sections/v02.dat 0 1 InelasticChangeParticle2 0.59 0 3
+CS cross_sections/v10.dat 0 2 InelasticChangeParticle2 0.0 0 1
+CS cross_sections/v20.dat 0 3 InelasticChangeParticle2 0.0 0 1
+CS cross_sections/v12.dat 0 2 InelasticChangeParticle2 0.315 0 3
+CS cross_sections/v21.dat 0 3 InelasticChangeParticle2 0.0 0 2
+CS cross_sections/1.dat 0 2 ElasticFixedParticle2 0.0 0 2
+CS cross_sections/1.dat 0 3 ElasticFixedParticle2 0.0 0 3
+CS cross_sections/4.dat 0 1 InelasticFixedParticle2 0.88 0 1
+CS cross_sections/5.dat 0 1 InelasticFixedParticle2 1.17 0 1
+CS cross_sections/6.dat 0 1 InelasticFixedParticle2 1.47 0 1
+CS cross_sections/7.dat 0 1 InelasticFixedParticle2 1.76 0 1
+CS cross_sections/8.dat 0 1 InelasticFixedParticle2 2.06 0 1
+CS cross_sections/9.dat 0 1 InelasticFixedParticle2 2.35 0 1
+CS cross_sections/10.dat 0 1 InelasticFixedParticle2 6.17 0 1
+CS cross_sections/11.dat 0 1 InelasticFixedParticle2 7.0 0 1
+CS cross_sections/12.dat 0 1 InelasticFixedParticle2 7.35 0 1
+CS cross_sections/13.dat 0 1 InelasticFixedParticle2 7.36 0 1
+CS cross_sections/14.dat 0 1 InelasticFixedParticle2 7.8 0 1
+CS cross_sections/15.dat 0 1 InelasticFixedParticle2 8.16 0 1
+CS cross_sections/16.dat 0 1 InelasticFixedParticle2 8.4 0 1
+CS cross_sections/17.dat 0 1 InelasticFixedParticle2 8.55 0 1
+CS cross_sections/18.dat 0 1 InelasticFixedParticle2 8.89 0 1
+CS cross_sections/19.dat 0 1 InelasticFixedParticle2 11.03 0 1
+CS cross_sections/20.dat 0 1 InelasticFixedParticle2 11.88 0 1
+CS cross_sections/21.dat 0 1 InelasticFixedParticle2 12.25 0 1
+CS cross_sections/22.dat 0 1 InelasticFixedParticle2 13.0 0 1
+CS cross_sections/23.dat 0 1 InelasticFixedParticle2 15.6 0 1
+CC "-----Output Control-----"
+CC "Dump particles of type i: {FV} {start time in stpes} {Stride in steps} {int type}" 
+FV 1000 150000 0

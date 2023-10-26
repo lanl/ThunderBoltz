@@ -1,0 +1,11 @@
+# Analytic He cross section fits
+Ralchenko_He_CS.csv: Transcribed from Ralchenko et al. https://doi.org/10.1016/j.adt.2007.11.003.
+
+# CCC He excitation cross section data
+CCC/He_DCS_potl.csv: Extracted from the work of Igor Bray and Dmitry V Fursa 2011 J. Phys. B: At. Mol. Opt. Phys. 44 061001
+
+# CCC He total ionization cross sections
+CCC/He_DCS_tcs.csv: Extracted from the work of Igor Bray and Dmitry V Fursa 2011 J. Phys. B: At. Mol. Opt. Phys. 44 061001
+
+# CCC electronic state binding energies
+CCC/He_thresholds.csv: Extracted from the work of Igor Bray and Dmitry V Fursa 2011 J. Phys. B: At. Mol. Opt. Phys. 44 061001
