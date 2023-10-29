@@ -9,15 +9,15 @@ cd ..
 # and exclude API params
 mkdir docs/build/latex/tables
 python docs/reformat_latex.py runoff remove-members copy-table add_afil
-cp docs/build/latex/thunderboltz.toc docs/tb_manual/tb_manual.toc
+cp docs/build/latex/thunderboltz.toc docs/cpp_manual/cpp_manual.toc
 
-cd docs/tb_manual
-pdflatex tb_manual
-bibtex tb_manual
-pdflatex tb_manual
-pdflatex tb_manual
+cd docs/cpp_manual
+pdflatex cpp_manual
+bibtex cpp_manual
+pdflatex cpp_manual
+pdflatex cpp_manual
 cd ../../
-cp docs/tb_manual/tb_manual.pdf tb_manual.pdf
+cp docs/cpp_manual/cpp_manual.pdf cpp_manual.pdf
 
 # Build API html docs
 cd docs
@@ -27,7 +27,7 @@ make latexpdf
 cd ..
 # Fix formating in API latex docs to prevent overrun tables.
 python docs/reformat_latex.py runoff add_afil
-cp docs/build/latex/thunderboltz.pdf pytb_manual.pdf
+cp docs/build/latex/thunderboltz.pdf api_manual.pdf
 # Open latex doc
-open pytb_manual.pdf
-open tb_manual.pdf
+open api_manual.pdf
+open cpp_manual.pdf

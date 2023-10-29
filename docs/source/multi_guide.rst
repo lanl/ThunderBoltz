@@ -5,9 +5,9 @@ Running Multiple Calculations
 In Sequence
 ~~~~~~~~~~~
 
-You can change simulation parameters in the :class:`~.pytb.ThunderBoltz`
+You can change simulation parameters in the :class:`~.thunderboltz.ThunderBoltz`
 object and run the program again in a new directory. Use
-the :meth:`~.pytb.ThunderBoltz.set_` method to update the desired parameters.
+the :meth:`~.thunderboltz.ThunderBoltz.set_` method to update the desired parameters.
 
 Suppose you wanted to run several calculation at various
 field values. To do this, loop through the field values,
@@ -17,12 +17,12 @@ object like so:
 .. code-block:: python
 
    import os
-   import pytb
+   import thunderboltz as tb
 
    # Make a base directory for this ensemble of simulations
    os.makedirs("multi_sim")
 
-   tb = ThunderBoltz(indeck=pytb.input.He_TB)
+   calc = ThunderBoltz(indeck=tb.input.He_TB)
 
    fields = [10, 100, 500]
    # Loop through the field values
@@ -30,11 +30,11 @@ object like so:
        # Create a new directory for this calculation
        subdir = os.path.join("multi_sim", f"{field}Td")
        os.makedirs(subdir)
-       tb.set_(Ered=field, directory=subdir)
+       calc.set_(Ered=field, directory=subdir)
        # Run the calculation
-       tb.run()
+       calc.run()
 
-Each call to :meth:`~.pytb.ThunderBoltz.run` will block until the
+Each call to :meth:`~..ThunderBoltz.run` will block until the
 corresponding simulation is finished.
 
 In Parallel
@@ -48,20 +48,20 @@ ThunderBoltz subprocesses in parallel like so:
 .. code-block:: python
 
    import os
-   import pytb
+   import thunderboltz as tb
 
    # Make a base directory for this ensemble of simulations
    base_path = "multi_sim_parallel"
    os.makedirs(base_path)
 
    # Create the base object for the calculation
-   tb = ThunderBoltz(indeck=pytb.input.He_TB)
+   calc = ThunderBoltz(indeck=tb.input.He_TB)
 
    fields = [10, 100, 500]
 
    # This time use the DistributedPool context,
    # passing the ThunderBoltz object like so
-   with DistributedPool(tb) as pool:
+   with DistributedPool(calc) as pool:
        # Loop through the field values
        for field in fields:
            # Create a new directory for this calculation
@@ -75,7 +75,6 @@ ThunderBoltz subprocesses in parallel like so:
 
    # The DistributedPool context will wait for all the jobs to finish
    # before continuing execution outside the 'with' block.
-
 
 .. warning::
 
@@ -95,21 +94,21 @@ With a Job Manager
 If HPC resources are available to the user, the python API
 includes a job manager compatible with the
 `SLURM <https://slurm.schedmd.com/documentation.html>`_ protocol.
-The :class:`~.pytb.parallel.SlurmManager` context allows for many different calculations
-to be split up among compute nodes, and further distributed across
-cores. Use it as follows:
+The :class:`~.thunderboltz.parallel.SlurmManager` context allows
+for many different calculations to be split up among compute nodes,
+and further distributed across cores. Use it as follows:
 
 .. code-block:: python
 
    import os
-   import pytb
+   import thunderboltz as tb
 
    # Make a base directory for this ensemble of simulations
    base_path = "multi_sim_slurm"
    os.makedirs(base_path)
 
    # Create the base object for the calculation
-   tb = ThunderBoltz(indeck=pytb.input.He_TB)
+   calc = ThunderBoltz(indeck=tb.input.He_TB)
 
    fields = [10, 100, 500]
 
@@ -125,7 +124,7 @@ cores. Use it as follows:
 
    # Use the SlurmManager Context, just like the DistributedPool context,
    # but also give it your SLURM options.
-   with SlurmManager(tb, base_path, **slurm_options) as slurm:
+   with SlurmManager(calc, base_path, **slurm_options) as slurm:
        # Loop through the field values
        for field in fields:
            # Create a new directory for this calculation

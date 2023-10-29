@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pytb"
+name = "thunderboltz"
 version = "0.1"
 dependencies = [
     "numpy>=1.23.0,<=1.27.0",
@@ -12,11 +12,11 @@ dependencies = [
     "scipy>=1.7.3",
     "seaborn>=0.12.2",
 ]
-description = "0D DSMC general plasma code"
+description = "A 0D Direct Simulation Monte-Carlo code for the calculation of transport coefficients and 0D gas modeling."
 readme = "README.md"
 requires-python = ">=3.7.16"
 
 [tool.setuptools.package-data]
-"pytb.data" = ["*.txt", "*.csv"]
-"pytb.data.CCC" = ["*.txt", "*.csv"]
-"pytb.thunderboltz" = ["*.cpp", "*.h"]
+"thunderboltz.data" = ["*.txt", "*.csv"]
+"thunderboltz.data.CCC" = ["*.txt", "*.csv"]
+"thunderboltz.cpp" = ["*.cpp", "*.h"]

@@ -6,31 +6,34 @@ Preparing Cross Sections
 There are a variety of ways to specify cross sections with the
 ThunderBoltz interface. In the :doc:`Quick Start Guide <quickstart>`,
 we used a built-in Helium cross section model. A more general approach
-to preparing cross sections is with the :class:`~.pytb.CrossSections` object.
+to preparing cross sections is with the :class:`~.thunderboltz.CrossSections`
+object.
 
 Initializing the ``CrossSections`` Object
 -----------------------------------------
 
-There are three main ways to initialize a :class:`~.pytb.CrossSections` object:
-
+There are three main ways to initialize a :class:`~.thunderboltz.CrossSections`
+object:
 
 #. With cross section data from another ThunderBoltz run
 
    .. code-block:: python
 
-      from pytb import CrossSections
+      from thunderboltz import CrossSections
       # Just specify the path to the simulation directory of a
       # different ThunderBoltz run.
       cross_sections = CrossSections(input_path="path/to/thunderboltz_sim_dir")
 
-  Refer to the :class:`~.pytb.CrossSections` section of the :doc:`API Reference <ref>` to ensure the
-  simulation data is set up correctly for interpretation by :class:`~.pytb.CrossSections`.
+   Refer to the :class:`~.thunderboltz.CrossSections` section of the
+   :doc:`API Reference <ref>` to ensure the
+   simulation data is set up correctly for interpretation by
+   :class:`~.thunderboltz.CrossSections`.
 
 #. By reading from an `LXCat <https://nl.lxcat.net>`_ text file extract.
 
    .. code-block:: python
 
-      from pytb import CrossSections
+      from thunderboltz import CrossSections
       # First initialize an empty cross sections object
       cross_sections = CrossSections()
       # Then reference a text file extract from LXCat
@@ -46,12 +49,12 @@ There are three main ways to initialize a :class:`~.pytb.CrossSections` object:
 
 #. By programmatically generating cross section data in python.
 
-   This approach involves the :class:`~.pytb.Process` object.
+   This approach involves the :class:`~.thunderboltz.Process` object.
 
    .. code-block:: python
 
-      from pytb import CrossSections
-      from pytb import Process
+      from thunderboltz import CrossSections
+      from thunderboltz import Process
 
       # Initialize an empty cross sections object
       cross_sections = CrossSection()
@@ -149,7 +152,8 @@ by printing out the ``data`` attribute.
 
    print(cross_section.data)
 
-To view a plot of the cross section data, use the :meth:`~pytb.CrossSections.plot_cs` method.
+To view a plot of the cross section data, use the
+:meth:`~thunderboltz.CrossSections.plot_cs` method.
 
 .. code-block:: python
 
@@ -159,9 +163,8 @@ To view a plot of the cross section data, use the :meth:`~pytb.CrossSections.plo
     # Make sure to include the import statement "import matplotlib.pyplot as plt"
     plt.show()
 
-See the API reference for plotting related quantities with the :meth:`~pytb.CrossSections.plot_cs`
-method.
-
+See the API reference for plotting related quantities with the
+:meth:`~thunderboltz.CrossSections.plot_cs` method.
 
 Attaching the ``CrossSections`` Object
 --------------------------------------
@@ -171,11 +174,11 @@ object using the ``cs`` keyword to use the cross section model within it.
 
 .. code-block:: python
 
-   tb = ThunderBoltz(
+   calc = ThunderBoltz(
        # ...
        cs=cross_sections,
        # ...
    )
 
-   tb.run()
+   calc.run()
    # ...

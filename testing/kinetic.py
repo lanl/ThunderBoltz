@@ -1,12 +1,11 @@
-"""Unit testing for the pytb.kinetic module."""
+"""Unit testing for the thunderboltz.kinetic module."""
 import copy
 
 import numpy as np
 from numpy import vectorize as vec
 import pandas as pd
 
-import pytb
-from pytb.kinetic import Process
+from thunderboltz.kinetic import Process
 
 ##### UNIT TESTS #####
 

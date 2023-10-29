@@ -9,13 +9,12 @@ data using the python API like so:
 
 .. code-block:: python
 
-   import pytb
+   import thunderboltz as tb
 
    # Pass the location of the simulation directory to be read
-   tb = pytb.read("path/to/previous/simulation_directory")
+   calc = tb.read("path/to/previous/simulation_directory")
 
-
-A single :class:`~.pytb.ThunderBoltz` object will be returned, with which
+A single :class:`~.thunderboltz.ThunderBoltz` object will be returned, with which
 you can easily `export <#exporting-data>`_ or `plot <#plotting-results>`_
 output data.
 
@@ -27,12 +26,12 @@ data for other purposes, you can use the ``read_cs_data`` argument:
 
 .. code-block:: python
 
-   import pytb
+   import thunderboltz as tb
 
-   tb = pytb.read("path/to/previous/simulation_directory", read_cs_data=True)
+   calc = tb.read("path/to/previous/simulation_directory", read_cs_data=True)
 
    # You will now see the cross section data has been loaded
-   print(tb.cs.data)
+   print(calc.cs.data)
 
 Reading Many Calculations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,26 +53,27 @@ read all of the output data at once. Imagine a directory structure like this:
 
 where several ThunderBoltz calculations are stored in one base directory
 located at ``path/to/base_path``. You locate and extract all relevant
-ThunderBoltz data out of a directory tree using the :py:func:`~.pytb.tb.query_tree`
-function:
+ThunderBoltz data out of a directory tree using the
+:py:func:`~.thunderboltz.tb.query_tree` function:
 
 .. code-block:: python
 
-   import pytb
+   import thunderboltz as tb
 
-   tbs = pytb.query_tree("path/to/base_path")
+   calcs = tb.query_tree("path/to/base_path")
 
    # Now you can access each of the simulation objects
    # separately. For example:
 
    # View the time series data from the first read calculation.
-   print(tbs[0].get_timeseries)
+   print(calcs[0].get_timeseries)
 
    # Plot the last velocity dump data from the fourth read calculation.
-   tbs[3].plot_vdfs()
+   calcs[3].plot_vdfs()
 
-See the :py:func:`~.pytb.tb.query_tree` API reference to learn about options for filtering
-criteria and automatically merging data from several calculations.
+See the :py:func:`~.thunderboltz.tb.query_tree` API reference to learn about
+options for filtering criteria and automatically merging data from several
+calculations.
 
 As with the `single calculation <#reading-a-single-calculation>`_ case,
 you can request the cross section data by providing the ``read_cs_data``
@@ -81,31 +81,32 @@ argument:
 
 .. code-block:: python
 
-   import pytb
+   import thunderboltz as tb
 
-   tbs = pytb.query_tree("path/to/previous/simulation_directory", read_cs_data=True)
+   calcs = tb.query_tree("path/to/previous/simulation_directory", read_cs_data=True)
 
    # Now each of the calculations will have cross section model data attached to them.
    # For example, this will print the collision table for the 3rd read in calculation.
-   print(tb[2].cs.table)
+   print(calcs[2].cs.table)
 
 Accessing Data
 ~~~~~~~~~~~~~~
 
 Either after a calculation has finished, or after reading output data as shown
-above, all data can be extracted from the :class:`~.pytb.ThunderBoltz` object:
+above, all data can be extracted from the :class:`~.thunderboltz.ThunderBoltz`
+object:
 
 Time-dependent data for the attributes found in
-:class:`~.pytb.parameters.OutputParameters` can be accessed with
-:meth:`~.pytb.ThunderBoltz.get_timeseries`:
+:class:`~.thunderboltz.parameters.OutputParameters` can be accessed with
+:meth:`~.thunderboltz.ThunderBoltz.get_timeseries`:
 
 .. code-block:: python
 
    data = tb.get_timeseries()
 
 Time-averaged data for the attributes found in
-:class:`~.pytb.parameters.OutputParameters` can be accessed with
-:meth:`~.pytb.ThunderBoltz.get_ss_params`:
+:class:`~.thunderboltz.parameters.OutputParameters` can be accessed with
+:meth:`~.thunderboltz.ThunderBoltz.get_ss_params`:
 
 .. code-block:: python
 
@@ -121,11 +122,11 @@ with a "_std" suffix added to the column name.
    Please verify that this is true by viewing the figures produced by
    :py:func:`plot_timeseries`. Otherwise, run the simulation for longer,
    or provide your own appropriate criteria via the ``ss_func`` option when
-   calling :meth:`~.pytb.ThunderBoltz.get_ss_params`.
+   calling :meth:`~.thunderboltz.ThunderBoltz.get_ss_params`.
 
 Output parameters for the attributes found in
-:class:`~.pytb.parameters.ParticleParameters` can be accessed with
-:meth:`~.pytb.ThunderBoltz.get_particle_tables`:
+:class:`~.thunderboltz.parameters.ParticleParameters` can be accessed with
+:meth:`~.thunderboltz.ThunderBoltz.get_particle_tables`:
 
 .. code-block:: python
 
@@ -162,17 +163,17 @@ The simplest option is to convert the data to a csv:
 Plotting Results
 ~~~~~~~~~~~~~~~~
 
-The :class:`~pytb.ThunderBoltz` API offers functions for
+The :class:`~thunderboltz.ThunderBoltz` API offers functions for
 automatically plotting results. See the documentation for the following
 functions
 
 .. autosummary::
 
-   pytb.ThunderBoltz.plot_timeseries
-   pytb.ThunderBoltz.plot_rates
-   pytb.ThunderBoltz.plot_edf_comps
-   pytb.ThunderBoltz.plot_edfs
-   pytb.ThunderBoltz.plot_cs
+   thunderboltz.ThunderBoltz.plot_timeseries
+   thunderboltz.ThunderBoltz.plot_rates
+   thunderboltz.ThunderBoltz.plot_edf_comps
+   thunderboltz.ThunderBoltz.plot_edfs
+   thunderboltz.ThunderBoltz.plot_cs
 
 These functions will plot the data into :class:`~.matplotlib.figure.Figure` objects,
 but in order to see the plots in a GUI, you must import the plotting library
@@ -180,24 +181,25 @@ and include the line ``plt.show()`` after calling plotting methods like so:
 
 .. code-block:: python
 
-   import pytb
+   import thunderboltz as tb
 
    # This will import the plotting library
    import matplotlib.pyplot as plt
 
    # Either read in data, or run calculations
-   tb = pytb.read("path/to/simulations_to_plot", read_cs_data=True)
+   calc = tb.read("path/to/simulations_to_plot", read_cs_data=True)
 
    # Call plotting methods
-   tb.plot_cs()
+   calc.plot_cs()
 
    # Show the plots and load a GUI
    plt.show()
 
 Alternatively, you may specify a directory within which to
 save a pdf file of the plot when calling any ``ThunderBoltz.plot_*`` method.
+For example:
 
 .. code-block:: python
 
-   tb.plot_cs(save="path/to/figure_directory")
+   calc.plot_cs(save="path/to/figure_directory")
 

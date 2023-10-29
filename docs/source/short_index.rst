@@ -73,7 +73,7 @@ Input Parameters
 .. autosummary::
    :toctree: api/
 
-   pytb.parameters.TBParameters
+   thunderboltz.parameters.TBParameters
 
 .. _output_params:
 
@@ -83,8 +83,8 @@ Output Parameters
 .. autosummary::
    :toctree: api/
 
-   pytb.parameters.OutputParameters
-   pytb.parameters.ParticleParameters
+   thunderboltz.parameters.OutputParameters
+   thunderboltz.parameters.ParticleParameters
 
 
 .. _memory:

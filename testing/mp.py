@@ -11,10 +11,10 @@ import time
 import numpy as np
 import pandas as pd
 
-import pytb
-from pytb import ThunderBoltz as TB
-from pytb.parallel import DistributedPool
-from pytb.parallel import SlurmManager
+import thunderboltz as tb
+from thunderboltz import ThunderBoltz as TB
+from thunderboltz.parallel import DistributedPool
+from thunderboltz.parallel import SlurmManager
 import testing
 from testing.utils import setup_
 from testing.utils import He_settings
@@ -28,17 +28,17 @@ def test_simple_mp():
     # Specify a set of reduced field values
     Efields = 10 + np.arange(cores)*10
     # Create a base TB object
-    tb = TB(NS=1001, **He_settings())
+    calc = TB(NS=1001, **He_settings())
     # Open up a multiprocessing context with this ThunderBoltz object
-    with DistributedPool(tb) as pool: # Loop through the conditions
+    with DistributedPool(calc) as pool: # Loop through the conditions
         for field in Efields:
             path = setup_(subdir=f"{field}vpm")
             # Send any updates through submit
             pool.submit(directory=path, E=field)
     # Exit from with block will wait for all processes to finish
     p = pjoin(*Path(path).parts[:-1])
-    tbs = pytb.tb.query_tree(p)
-    tss = pd.concat([tb.get_timeseries() for tb in tbs], ignore_index=True)
+    calcs = tb.query_tree(p)
+    tss = pd.concat([c.get_timeseries() for c in calcs], ignore_index=True)
     # Ensure all the steps of all processes get collected from reader
     assert len(tss) == 11*cores
 
@@ -54,7 +54,7 @@ def test_slurm_submission():
         base_dir = TEST_OUTPUT_DIR
     path = setup_(base_directory=base_dir)
     # Create base ThunderBoltz Object
-    tb = TB(NS=201, indeck=pytb.input.He_TB)
+    calc = TB(NS=201, indeck=tb.input.He_TB)
     # Setup (5/4 * ncores) calculations (e.g. require 2 nodes, 1 with 36 cores, # 1 with 9 cores)
     ncores = mp.cpu_count()
     njobs = int(5/4 * ncores)
@@ -71,7 +71,7 @@ def test_slurm_submission():
     }
     # Add modules required for compute nodes
     mods = ["python", "gcc"]
-    with SlurmManager(tb, path, modules=mods, mock=mock, **slurm_options) as slurm:
+    with SlurmManager(calc, path, modules=mods, mock=mock, **slurm_options) as slurm:
         for field in Efields:
             subpath = setup_(subdir=f"{field}vpm", base_directory=base_dir)
             slurm.submit(directory=subpath, E=field)
@@ -82,9 +82,9 @@ def test_slurm_submission():
             time.sleep(1)
 
     # Read the resulting calculations
-    tbs = pytb.tb.query_tree(path)
-    tss = pd.concat([tb.get_timeseries() for tb in tbs], ignore_index=True)
-    fields = sorted([tb.tb_params["E"] for tb in tbs])
+    calcs = tb.query_tree(path)
+    tss = pd.concat([calc.get_timeseries() for calc in calcs], ignore_index=True)
+    fields = sorted([calc.tb_params["E"] for calc in calcs])
     # Ensure all the steps of all processes get collected from reader
     assert np.all(fields == Efields)
     assert len(tss) == 3*njobs

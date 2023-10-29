@@ -1,3 +1,11 @@
 *.DS_Store
 *.pyc
-*pytb.egg-info
+*.egg-info
+docs/build/*
+docs/source/api/*
+*.aux
+*.bbl
+*.blg
+*.idx
+*.out
+*manual.log

@@ -77,8 +77,8 @@ def fix_doc_runoff():
     path = pjoin("docs", "build", "latex")
     file =  "thunderboltz.tex"
     file_path = pjoin(path, file)
-    split_sphinx_table(file_path, "pytb.ThunderBoltz", "Methods", "get_etrans")
-    split_sphinx_table(file_path, "pytb.parameters.WrapParameters", "Attributes", "duration")
+    split_sphinx_table(file_path, "thunderboltz.ThunderBoltz", "Methods", "get_etrans")
+    split_sphinx_table(file_path, "thunderboltz.parameters.WrapParameters", "Attributes", "duration")
 
     og = os.getcwd()
     os.chdir(path)
@@ -120,13 +120,14 @@ def remove_members():
     path = pjoin("docs", "build", "latex")
     file = "thunderboltz.tex"
     file_path = pjoin(path, file)
-    remove_member(file_path, "pytb.parameters.OutputParameters", "Attributes", r"mobN")
-    remove_member(file_path, "pytb.parameters.OutputParameters", "Attributes", r"mobN\_bulk")
-    remove_member(file_path, "pytb.parameters.OutputParameters", "Attributes", r"a\_n")
-    remove_member(file_path, "pytb.parameters.OutputParameters", "Attributes", r"a\_n\_bulk")
-    remove_member(file_path, "pytb.parameters.OutputParameters", "Attributes", r"n\_gas")
-    remove_member(file_path, "pytb.parameters.OutputParameters", "Attributes", r"k\_ion")
-    remove_member(file_path, "pytb.parameters.OutputParameters", "Attributes", r"k\_1")
+    section = "thunderboltz.parameters.OutputParameters"
+    remove_member(file_path, section, "Attributes", r"mobN")
+    remove_member(file_path, section, "Attributes", r"mobN\_bulk")
+    remove_member(file_path, section, "Attributes", r"a\_n")
+    remove_member(file_path, section, "Attributes", r"a\_n\_bulk")
+    remove_member(file_path, section, "Attributes", r"n\_gas")
+    remove_member(file_path, section, "Attributes", r"k\_ion")
+    remove_member(file_path, section, "Attributes", r"k\_1")
 
 def extract_table(tfile, section, subsection):
     fpath = pjoin("docs", "build", "latex", "thunderboltz.tex")

@@ -1,7 +1,7 @@
 =============
 API Reference
 =============
-.. currentmodule:: pytb
+.. currentmodule:: thunderboltz
 
 .. autosummary::
    :toctree: api/

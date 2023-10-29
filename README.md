@@ -11,8 +11,8 @@ track electron transport (either via trajectories in the MC case, or through mod
 of the EEDF) due to collisions with a stationary neutral background.
 
 ## Manuals
-The ThunderBoltz C++ source code manual is found in the home directory "tb_manual.pdf",
-and the Python API code manual is found in the home directory "pytb_manual.pdf".
+The ThunderBoltz C++ source code manual is found in the home directory "cpp_manual.pdf",
+and the Python API code manual is found in the home directory "api_manual.pdf".
 
 ## Installation
 
@@ -30,7 +30,7 @@ source in `src/thunderboltz`.
 ## Usage
 
 For ease of use, we recommend using the Python interface to setup, run,
-and process simulations ([see here](#using-the-pytb-python-wrapper)).
+and process simulations ([see here](#using-the-python-wrapper)).
 Alternatively, one can use the stand-alone C++
 code to run calculations (below).
 
@@ -64,7 +64,7 @@ g++ -std=c++17 -o thunderboltz.bin DSMC0D.cpp
 ./thunderboltz.bin N2vib.in
 ```
 
-### Using the pytb Python wrapper
+### Using the Python wrapper
 
 We also include a python wrapper that allows for automated compilation
 and extended input/output processing. Run the `install.sh` script from the
@@ -76,7 +76,7 @@ This will upgrade `pip` and install specific versions of python packages,
 so create an environment if you are concerned with python package overwrite.
 
 See `run.py` for implementations of the tests found in the paper
-using the pytb wrapper.
+using the API wrapper.
 
 
 ## Testing and code sync
@@ -85,20 +85,14 @@ Make sure a version of pytest is installed:
 ```
 pip install pytest
 ```
-To run unit tests on the `pytb` package, run
+To run unit tests on the python thunderboltz package, run
 ```
 python -m pytest testing/*.py --verbose
 ```
 
-Currently, pytb has its own version of the Thunderboltz source code in
-`src/pytb/thunderboltz`. To update it with the main version, run
-```
-cp src/thunderboltz/* src/pytb/thunderboltz
-```
-
 To recompile the standalone binary version, run
 ```
-g++ -std=c++17 src/thunderboltz/DSMC0D.cpp -o bin/thunderboltz.bin -Wall -Werror -Wsign-compare
+g++ -std=c++17 src/thunderboltz/cpp/DSMC0D.cpp -o bin/thunderboltz.bin -Wall -Werror -Wsign-compare
 ```
 
 ## License

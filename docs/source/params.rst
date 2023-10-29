@@ -9,8 +9,8 @@ Input Parameters
 .. autosummary::
    :toctree: api/
 
-   pytb.parameters.TBParameters
-   pytb.parameters.WrapParameters
+   thunderboltz.parameters.TBParameters
+   thunderboltz.parameters.WrapParameters
 
 .. _output_params:
 
@@ -20,8 +20,8 @@ Output Parameters
 .. autosummary::
    :toctree: api/
 
-   pytb.parameters.OutputParameters
-   pytb.parameters.ParticleParameters
+   thunderboltz.parameters.OutputParameters
+   thunderboltz.parameters.ParticleParameters
 
 
 .. _memory:
@@ -42,13 +42,15 @@ However, in scenarios where there is significant electron generation,
 i.e. at high :math:`E` fields with the ``Ionization`` model on,
 the default memory settings are not sufficient and the simulation
 will exit with the error "Too many particles!". To prevent this
-specify the ``MEM`` flag in the :class:`~.pytb.ThunderBoltz` constructor:
+specify the ``MEM`` flag in the :class:`~.thunderboltz.ThunderBoltz` constructor:
 
 .. code-block:: python
 
-   tb = ThunderBoltz(
+   import thunderboltz as tb
+
+   calc = tb.ThunderBoltz(
         # For example, using the Helium model.
-        indeck=pytb.input.He_TB,
+        indeck=tb.input.He_TB,
         # This will turn on electron generation for the Helium model
         # i.e. this will ensure the "Ionization" collision model is
         # used in the generated indeck.

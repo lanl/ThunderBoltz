@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import pickle
-import pytb
-from pytb.kinetic import Process
-from pytb.parallel import SlurmManager
-from pytb.parallel import DistributedPool
+import thunderboltz as tb
+from thunderboltz.kinetic import Process
+from thunderboltz.parallel import SlurmManager
+from thunderboltz.parallel import DistributedPool
 import visualize
 
 # Physical Constants
@@ -33,7 +33,7 @@ def onsager_relation():
     L = 1e-6
 
     # Initialize cross sections
-    cross_sections = pytb.CrossSections()
+    cross_sections = tb.CrossSections()
     # Make the processes
     # Some processes have a threshold energy of 1eV
     activated = lambda cs: (lambda e: cs if e > 1 else 0)
@@ -79,7 +79,7 @@ def onsager_relation():
     # print(cross_sections.data)
 
     # Generate the ThunderBoltz wrapper object
-    tb = pytb.ThunderBoltz(
+    calc = tb.ThunderBoltz(
         cs=cross_sections,
         duration=.2e-6, # run .2 millisecond sim
         DT=2e-11,       # Seconds per step
@@ -100,7 +100,7 @@ def onsager_relation():
 
     # Run the simulation
     # File writing will be invoked here
-    tb.run(std_banner=False, live=False)
+    calc.run(std_banner=False, live=False)
 
     # Plot results once finished
     visualize.plot_onsager()
@@ -116,7 +116,7 @@ def ikuta_sugai():
     # Cell size (m)
     L = 1e-6
     # Initial flow velocity
-    tb = pytb.tb.ThunderBoltz(
+    calc = tb.ThunderBoltz(
         NS=200000, # Number of steps
         DT=5e-11, # Seconds per step
         Ered=1, # E-field strength [Td]
@@ -132,11 +132,11 @@ def ikuta_sugai():
     )
 
     # Add a constant process
-    tb.cs.add_process(Process("ElasticFixedParticle2",
+    calc.cs.add_process(Process("ElasticFixedParticle2",
         cs_func = lambda e: 1e-20, name="IkutaElastic"))
 
     # Loop through B/n values
-    with DistributedPool(tb) as pool:
+    with DistributedPool(calc) as pool:
         for Bred in [0, 10, 25, 50]:
             # Use new directory and assign new reduced B-field.
             pool.submit(directory=setup_(subdir=f"{Bred}Hx"), Bred=[0, Bred, 0])
@@ -148,8 +148,8 @@ def He_transport():
     fields with various electron energy sharing distribution models."""
     path = setup_(scratch=False)
     # Create ThunderBoltz object
-    tb = pytb.ThunderBoltz(
-        indeck=pytb.input.He_TB,
+    calc = tb.ThunderBoltz(
+        indeck=tb.input.He_TB,
         eesd="uniform",
         eadf="default",
         Ered=1500,
@@ -168,7 +168,7 @@ def He_transport():
     # Run the following reduced fields
     Ereds = [1, 10, 50, 70, 100, 150, 200, 272.8, 323, 407, 500, 600, 704, 823, 1000, 1500]
     job_counter = 0
-    with DistributedPool(tb) as pool:
+    with DistributedPool(calc) as pool:
         for eesd in ["default", "equal"]:
             for Ered in Ereds:
                 # Setup path in scratch directory

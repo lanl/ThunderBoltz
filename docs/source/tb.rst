@@ -3,7 +3,7 @@
 ============
 ThunderBoltz
 ============
-.. currentmodule:: pytb
+.. currentmodule:: thunderboltz
 
 Constructor
 ===========

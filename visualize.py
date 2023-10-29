@@ -7,12 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import pytb
-from pytb.tb import read
-from pytb.tb import query_tree
-from pytb.plotting import pdplot
-from pytb.plotting import styles
-
+import thunderboltz as tb
+from thunderboltz import read
+from thunderboltz import query_tree
+from thunderboltz.plotting import pdplot
+from thunderboltz.plotting import styles
 
 def plot_He_transport():
     """Plot bulk and flux transport parameters vs. reduced electric field."""
@@ -54,7 +53,7 @@ def plot_He_transport():
     x0, x_width = 0.52, 0.48
     inset_bounds = [[[x0, .09, x_width, .5]], [None]]
 
-    p = pytb.plotting.pdplot.PandaPlot(dat, x=x, y=y, err_bars=errs, series="series", remove_ext=True,
+    p = tb.plotting.pdplot.PandaPlot(dat, x=x, y=y, err_bars=errs, series="series", remove_ext=True,
         legend_style="figure bottom", xscale="log", yscale="log", label_map=styles.label_maps,
         value_map=styles.value_maps, series_styles=ss, gui_configure=False, save_spacing_config=True,
         load_spacing_config=False, legend_ordering=legend_ordering, config_dir="simulations", inset_bounds=inset_bounds,
@@ -174,15 +173,15 @@ def N2_cs_resolve():
 def plot_onsager():
     """Generate kinetic plots to compare to the Onsager relation."""
     # Read thunderboltz calculation directory
-    tb = read(pjoin("simulations", "onsager_relation"))
-    ts = tb.get_timeseries()
-    tab = tb.cs.table
+    calc = read(pjoin("simulations", "onsager_relation"))
+    ts = calc.get_timeseries()
+    tab = calc.cs.table
 
     # This is the species ordering
     sp = ["X", "A", "B", "C"]
 
     # Grab the densities
-    ns = pd.concat([tb.particle_tables[i]["Ni"]
+    ns = pd.concat([calc.particle_tables[i]["Ni"]
                      for i in range(1, 4)], axis=1)
     # Rename columns
     ns.columns = ["$n_A$", "$n_B$", "$n_C$"]
@@ -248,9 +247,9 @@ def plot_ikuta_sugai():
     """Generate a velocity moment profile at various
     crossed reduced E/B-fields"""
     # Read output files from simulation base
-    tbs = query_tree(pjoin("simulations", "ikuta_sugai"))
+    calcs = query_tree(pjoin("simulations", "ikuta_sugai"))
     # Extract steady state parameters
-    ss = pd.concat([tb.get_ss_params() for tb in tbs], ignore_index=True)
+    ss = pd.concat([calc.get_ss_params() for calc in calcs], ignore_index=True)
     # Only need B/n, Vxi, Vzi
     ss = ss[["Bred", "Vxi", "Vzi", "MEe"]].copy()
     # Reformat reduced values
@@ -284,12 +283,12 @@ def plot_ikuta_sugai():
 
 def view_all_plots():
     # Read output files from simulation base
-    tbs = query_tree(pjoin("simulations", "He_transport"))
-    tb = tbs[-1]
-    tb.plot_timeseries()
-    tb.plot_vdfs()
-    tb.plot_edfs()
-    tb.plot_edf_comps()
+    calcs = query_tree(pjoin("simulations", "He_transport"))
+    calc = calcs[-1]
+    calc.plot_timeseries()
+    calc.plot_vdfs()
+    calc.plot_edfs()
+    calc.plot_edf_comps()
 
     plt.show()
 
@@ -330,9 +329,9 @@ def invert_coords(ax, x, y):
 
 def load_transport_data():
     # Read simulation output data
-    dat = pytb.query_tree(
+    dat = tb.query_tree(
         "simulations/He_transport", # Read all the calculations in this directory
-        callback=lambda tb: tb.get_ss_params() # return their steady state values.
+        callback=lambda calc: calc.get_ss_params() # return their steady state values.
     )
     dat = dat[dat.eesd.isin(["default", "equal"])].copy()
 

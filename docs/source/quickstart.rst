@@ -19,14 +19,14 @@ In a new file ``run_example.py``, write the following:
 
    import os # Operating system interface for making directories
 
-   from pytb import ThunderBoltz # Import the main simulation object
-   from pytb.input import He_TB  # This is a built-in He model preset
+   from thunderboltz import ThunderBoltz # Import the main simulation object
+   from thunderboltz.input import He_TB  # This is a built-in He model preset
 
    # First we will make a folder in the current directory to house
    # The simulation output / logging files.
    os.makedirs("example_sim")
 
-   tb = ThunderBoltz(
+   calc = ThunderBoltz(
 
         # Specify internal ThunderBoltz settings.
         DT=1e-10,             # Time step of 0.1 ns.
@@ -67,7 +67,7 @@ In a new file ``run_example.py``, write the following:
    # to run. To do this, just call the "run" method. This will write the
    # necessary input files, compile the program from package source into the
    # simulation directory, and execute the program in a subprocess.
-   tb.run(
+   calc.run(
        # By default, all output is written into files and not stdout,
        # but data can also be printed to stdout by setting
        std_banner=True,
@@ -78,10 +78,10 @@ In a new file ``run_example.py``, write the following:
 
    # This will extract step by step data for reaction counts/rates,
    # electron mobility, drift velocity, and more.
-   ts = tb.get_timeseries()
+   ts = calc.get_timeseries()
    # This will extract the same quantities but time averaged during the
    # steady state period of the run.
-   steady_state = tb.get_ss_params()
+   steady_state = calc.get_ss_params()
 
    # Sometimes it is easier to extract data once it is already been
    # calculated. The next section will demonstrate how to asynchronously
@@ -118,16 +118,16 @@ is finished like so:
    import matplotlib.pyplot as plt
 
    # This will read single calculations and return ThunderBoltz objects.
-   from pytb import read
+   from thunderboltz import read
 
    # Ensure you are running this code from the same place as above, and
    # just pass the location of the simulation directory.
-   tb = read("example_sim")
+   calc = read("example_sim")
 
    # Now all the same data will be available in the form of pandas DataFrames.
-   timeseries = tb.get_timeseries() # Returns timeseries data in a DataFrame.
-   steady_state = tb.get_ss_params() # Returns steady state data in a DataFrame.
-   velocity_data = tb.get_vdfs("all") # Returns all velocity dump data in a DataFrame.
+   timeseries = calc.get_timeseries() # Returns timeseries data in a DataFrame.
+   steady_state = calc.get_ss_params() # Returns steady state data in a DataFrame.
+   velocity_data = calc.get_vdfs("all") # Returns all velocity dump data in a DataFrame.
 
    # These frames are convenient because they can be easily manipulated and
    # exported
@@ -155,13 +155,13 @@ is finished like so:
    # This will plot step by step data for any of the output
    # parameters available in the time series table. Default
    # is mean energy, mobility, and Townshend ionization coefficient
-   tb.plot_timeseries()
+   calc.plot_timeseries()
 
    # This will plot the rate coefficients for every process.
-   tb.plot_rates()
+   calc.plot_rates()
 
    # This will plot a joint plot of the electron velocity distribution function
-   tb.plot_vdfs()
+   calc.plot_vdfs()
 
    # This will show a GUI and is required to actually display the plots.
    plt.show()

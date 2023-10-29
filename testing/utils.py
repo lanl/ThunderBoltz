@@ -5,9 +5,9 @@ from os.path import join as pjoin
 from os.path import expandvars as expand
 import shutil
 
-import pytb
-from pytb import ThunderBoltz as TB
-from pytb.parallel import SlurmManager
+import thunderboltz as tb
+from thunderboltz import ThunderBoltz as TB
+from thunderboltz.parallel import SlurmManager
 
 TEST_OUTPUT_DIR = pjoin("testing", "output")
 
@@ -34,21 +34,21 @@ def array_test(key, vals, **fixed):
     of ThunderBoltz, ensuring the error stack is empty and data
     has no NaNs."""
     for v in vals:
-        tb = TB(L=1e-7, NS=101, NP=[100, 10],
+        calc = TB(L=1e-7, NS=101, NP=[100, 10],
                 **He_settings(1), **{key:v}, **fixed)
-        tb.run()
+        calc.run()
         # Read files
-        tb.get_timeseries()
+        calc.get_timeseries()
         # error stack should be empty
-        assert not tb.err_stack
+        assert not calc.err_stack
 
 def He_settings(i=0):
     """Use automated helium input deck with auto file writing.
     Increment `i` if this function is being wrapped in another
     intermediary."""
-    return {"directory": setup_(1+i), "indeck": pytb.input.He_TB}
+    return {"directory": setup_(1+i), "indeck": tb.input.He_TB}
 
-def slurm_debug(tb, path=None, nodes=1, time=60, **kwargs):
+def slurm_debug(calc, path=None, nodes=1, time=60, **kwargs):
     """Setup a default debug slurm context"""
     if path is None:
         path = setup_(1, base_directory=expand("$SCR"))
@@ -60,4 +60,4 @@ def slurm_debug(tb, path=None, nodes=1, time=60, **kwargs):
         "reservation": "debug",
     }
     mods = ["python", "gcc"]
-    return SlurmManager(tb, path, mods=mods, **slurm_options, **kwargs)
+    return SlurmManager(calc, path, mods=mods, **slurm_options, **kwargs)
