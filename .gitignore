@@ -1,11 +1,27 @@
+# UNIX
 *.DS_Store
+
+# Python
 *.pyc
 *.egg-info
+
+# Sphinx
 docs/build/*
 docs/source/api/*
+
+# Latex
 *.aux
 *.bbl
 *.blg
 *.idx
 *.out
-*manual.log
+*.log
+*.xdy
+*.sty
+*.cls
+*.bat
+*.ist
+*Makefile
+*latexmkjarc
+*latexmkrc
+
