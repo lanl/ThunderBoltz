@@ -36,6 +36,7 @@ code to run calculations (below).
 
 ### Manual compilation and execution (ThunderBoltz code only)
 
+The C++ source files are located in `src/thunderboltz/cpp/`.
 ThunderBoltz requires a g++ of clang compiler and should be compiled
 from source directories as
 ```
@@ -55,7 +56,7 @@ Here is an example of how to run a simple ThunderBoltz calculation.
 mkdir example_sim
 cd example_sim
 # Copy the source over
-cp ../src/thunderboltz/* .
+cp ../src/thunderboltz/cpp/* .
 # Copy example input files over
 cp -r ../indecks/N2/* .
 # Compile
@@ -63,12 +64,13 @@ g++ -std=c++17 -o thunderboltz.bin DSMC0D.cpp
 # Run
 ./thunderboltz.bin N2vib.in
 ```
+Simulation parameters can be adjusted in the `N2vib.in` file for this example.
 
 ### Using the Python wrapper
 
 We also include a python wrapper that allows for automated compilation
-and extended input/output processing. Run the `install.sh` script from the
-root directory to install the python package.
+and extended input/output processing. To install the python API from the
+repository, run the `install.sh` script from the root directory:
 ```
 ./install.sh
 ```
@@ -77,7 +79,6 @@ so create an environment if you are concerned with python package overwrite.
 
 See `run.py` for implementations of the tests found in the paper
 using the API wrapper.
-
 
 ## Testing and code sync
 
