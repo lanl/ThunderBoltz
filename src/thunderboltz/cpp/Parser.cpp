@@ -11,7 +11,6 @@ void ReadInput(std::string inputFileName, InputData *SimulationParam)
     SimulationParam->OS=100;
     SimulationParam->CR=0;
     SimulationParam->NSigmaMaxSamples=1000;
-    SimulationParam->CollOrder = "default";
 	std::vector<std::string> CrossSecFile,CollType;
 	std::vector<int> part1, part2, prod1, prod2;
 	std::vector<double> DelE;
@@ -208,11 +207,6 @@ void ReadInput(std::string inputFileName, InputData *SimulationParam)
             // Add option for auto dump at the end of a SLURM run
             file >> SimulationParam->Slurm;
             printf("reading auto dump spec: %d\n", SimulationParam->Slurm);
-        }
-
-        if(Index=="CO") {
-            file >> SimulationParam->CollOrder;
-            printf("reading collision order spec: %s\n", SimulationParam->CollOrder.c_str());
         }
 
         if(Index=="CR") {

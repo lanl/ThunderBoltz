@@ -478,21 +478,8 @@ void DSMCcollideNTC(Particles *particle_list, CrossSections *CrossSecList, Input
     int particleType1, particleType2,product2Type,product1Type;
     numcollisiontype=CrossSecList->NCrossSec;
 
-    // Build collision ordering, can be regular, `Random` or `Reverse`
-    std::vector<int> cols;
-    for (int i=0; i < numcollisiontype; i++) {
-        cols.push_back(i);
-    }
-    if (SimulationParam->CollOrder == "Random") {
-        std::shuffle(cols.begin(), cols.end(), std::default_random_engine(rand()));
-    } else if (SimulationParam->CollOrder == "Reverse") {
-        std::reverse(cols.begin(), cols.end());
-    }
-
-    for(int i_dummy=0;i_dummy<numcollisiontype; i_dummy++)
+    for(int i=0;i<numcollisiontype; i++)
     {
-        int i = cols[i_dummy]; // Select collision type from collision ordering
-
         if(quiet==1) printf("==========================\n");
         if(quiet==1) printf("Collision Diagnostics\n");
         if(quiet==1) printf("==========================\n");

@@ -63,9 +63,6 @@ class TBParameters(Parameters):
     #: data before job allocation runs out —
     #: options are ``0`` (don't auto dump) | ``1`` (dump using SLURM setup).
     SE=0
-    #: (str) Collision ordering, options are
-    #: ``"default"`` | ``"Random"`` | ``"Reverse"``.
-    CO="default"
     #: (int) Time step stride for output parameters, default is ``100``.
     OS=100
     #: (int) If ``1``, then the remainder of :math:`N_{\rm pairs}` is
