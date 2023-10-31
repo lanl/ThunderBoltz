@@ -3,6 +3,30 @@ import os
 from os.path import join as pjoin
 import sys
 
+def add_laur(source, laur):
+    with open(source) as f:
+        s = f.read()
+    m = re.search(r"\\date", s)
+    i = s.count("\n", 0, m.start())
+    lines = s.split("\n")
+    laur_str = f"LA-UR-{laur}"
+    print("FINDME", lines[i])
+    lines[i] = lines[i][:-1] + r"\\" + laur_str + r"}"
+    print("FINDME", lines[i])
+    with open(source, "w") as f:
+        f.write("\n".join(lines))
+
+def set_title(source, title):
+    with open(source) as f:
+        s = f.read()
+    m = re.search(r"\\title", s)
+    i = s.count("\n", 0, m.start())
+    lines = s.split("\n")
+    lines[i] = r"\title{" + title + r"}"
+    print("\n".join(lines))
+    with open(source, "w") as f:
+        f.write("\n".join(lines))
+
 def add_affiliation(source):
     with open(source) as f:
         s = f.read()
@@ -164,6 +188,7 @@ def extract_tables():
 if __name__ == "__main__":
     path = pjoin("docs", "build", "latex")
     file = "thunderboltz.tex"
+    source = pjoin(path, file)
 
     if "runoff" in sys.argv:
         fix_doc_runoff()
@@ -175,7 +200,15 @@ if __name__ == "__main__":
         extract_tables()
 
     if "add_afil" in sys.argv:
-        add_affiliation(pjoin(path, file))
+        add_affiliation(source)
+
+    if "--title" in sys.argv:
+        ti = sys.argv.index("--title")
+        set_title(source, sys.argv[ti+1])
+
+    if "--laur" in sys.argv:
+        ti = sys.argv.index("--laur")
+        add_laur(source, sys.argv[ti+1])
 
     og = os.getcwd()
     os.chdir(path)

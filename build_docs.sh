@@ -8,7 +8,8 @@ cd ..
 # Fix formating in C++ latex docs to prevent overrun tables
 # and exclude API params
 mkdir docs/build/latex/tables
-python docs/reformat_latex.py runoff remove-members copy-table add_afil
+python docs/reformat_latex.py runoff remove-members copy-table add_afil \
+    --title "ThunderBoltz C++ Manual" --laur "23-31893"
 cp docs/build/latex/thunderboltz.toc docs/cpp_manual/cpp_manual.toc
 
 cd docs/cpp_manual
@@ -26,7 +27,8 @@ make html && open build/html/index.html
 make latexpdf
 cd ..
 # Fix formating in API latex docs to prevent overrun tables.
-python docs/reformat_latex.py runoff add_afil
+python docs/reformat_latex.py runoff add_afil \
+    --title "ThunderBoltz API Manual" --laur "23-32356"
 cp docs/build/latex/thunderboltz.pdf api_manual.pdf
 # Open latex doc
 open api_manual.pdf
