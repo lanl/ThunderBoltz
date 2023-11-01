@@ -8,8 +8,6 @@ This documentation includes some simple tutorials for using
 the ThunderBoltz plasma simulation package and a complete
 public API reference
 
-LA-UR-23-32356
-
 Installation
 ------------
 
