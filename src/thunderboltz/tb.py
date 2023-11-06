@@ -3,7 +3,7 @@ import copy
 from datetime import datetime
 import io
 import json
-import multiprocessing  as mp
+import multiprocessing as mp
 import os
 from os import listdir as ls
 from os.path import join as pjoin
@@ -556,7 +556,7 @@ class ThunderBoltz(MPRunner):
         os.chdir(pwd)
 
     def compile_debug(self):
-        """Prepare all files and compile with -g debug flag."""
+        """Prepare all files and compile ThunderBoltz with -g debug flag."""
         self.run(dryrun=True, debug=True)
 
     def add_callback(self, f):
