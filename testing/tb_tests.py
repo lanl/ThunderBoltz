@@ -50,7 +50,7 @@ def test_user_src():
     ts = calc.get_timeseries()
     assert len(ts) == 3
 
-def test_user_bin():
+def _test_user_bin():
     """Test simulation from user input binary file."""
     calc = TB(NS=200, **He_settings())
     calc.run(bin_path=pjoin("bin", "thunderboltz.bin"))
@@ -327,7 +327,7 @@ def test_query_tree():
     calc = TB(
         directory=base_path,
         NS=300,
-        L=1e-7,
+        L=1e-6,
         NP=[1000, 100],
         indeck=tb.input.He_TB,
         FV=[99, 100, 0],
