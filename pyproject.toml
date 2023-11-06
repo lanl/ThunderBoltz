@@ -1,22 +1,49 @@
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "thunderboltz"
-version = "0.1"
-dependencies = [
-    "numpy>=1.23.0,<=1.27.0",
-    "pandas>=2.0.1",
-    "matplotlib>=3.7.1",
-    "scipy>=1.7.3",
-    "seaborn>=0.12.2",
-]
+version = "0.1.0"
 description = "A 0D Direct Simulation Monte-Carlo code for the calculation of transport coefficients and 0D gas modeling."
+authors = ["Ryan Park <rmpark@umich.edu>",
+           "Brett Scheiner <brett.s.scheiner@gmail.com>",
+           "Mark Zammit <mzammit@lanl.gov>",
+]
 readme = "README.md"
-requires-python = ">=3.7.16"
+license = "GPL"
+include = [
+    "src/thunderboltz/cpp/{*.cpp,*.h}",
+    "src/thunderboltz/data/{*.txt,*.csv}",
+    "src/thunderboltz/data/CCC/{*.txt,*.csv}",
+]
 
-[tool.setuptools.package-data]
-"thunderboltz.data" = ["*.txt", "*.csv"]
-"thunderboltz.data.CCC" = ["*.txt", "*.csv"]
-"thunderboltz.cpp" = ["*.cpp", "*.h"]
+[tool.poetry.dependencies]
+python = ">=3.8"
+numpy = ">=1.23.0,<=1.27.0"
+pandas = ">=2.0.1"
+matplotlib = ">=3.7.1"
+scipy = {version=">=1.7.3", python=">=3.8,<3.11"}
+seaborn = ">=0.12.2"
+
+[tool.poetry.group.dev.dependencies]
+sphinx = {version = "^7.2.6", python = ">=3.9"}
+sphinx-autoapi = "^3.0.0"
+sphinxcontrib-napoleon = "^0.7"
+furo = "^2023.9.10"
+python-semantic-release = "^8.3.0"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+
+[tool.semantic_release]
+verions_toml = ["pyproject.toml:tool.poetry.version"]
+branch = "main"
+changlog_file = "CHANGELOG.md"
+build_command = "poetry build"
+dist_path = "dist/"
+upload_to_release = true
+upload_to_pypi = false
+remove_dist = false
+patch_without_tag = false
+
+[tool.setuptools_scm]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
