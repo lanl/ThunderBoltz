@@ -32,6 +32,8 @@ extensions = [
     "sphinx.ext.viewcode",
     # Link to external docs
     "sphinx.ext.intersphinx",
+    # RTD html theme
+    "sphinx_rtd_theme"
 ]
 
 intersphinx_mapping = {
