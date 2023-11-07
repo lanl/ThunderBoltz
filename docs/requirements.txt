@@ -1,5 +1,4 @@
 sphinx-autoapi
 sphinxcontrib-napoleon
-sphinx-rtd-theme
 
 
