@@ -59,7 +59,6 @@ to use a manually constructed indeck file. The code is maintained with the
 standard `-Wall` and `-Werror` compiler options.
 
 Here is an example of how to run a simple ThunderBoltz calculation.
-
 ```
 # Make a directory for testing
 mkdir example_sim
