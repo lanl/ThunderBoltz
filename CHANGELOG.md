@@ -18,6 +18,8 @@ Add autoapi dir spec. ([`ca4bc1d`](https://github.com/lanl/ThunderBoltz/commit/c
 
 ### Documentation
 
+* docs: format readme ([`7d6b6b6`](https://github.com/lanl/ThunderBoltz/commit/7d6b6b6ad4d22b1b6dbdd7e823ebd3a5c75c3670))
+
 * docs: require napoleon build vsn ([`3a0f20f`](https://github.com/lanl/ThunderBoltz/commit/3a0f20f94f44f03568d9330e8803d46d016b7f65))
 
 * docs: require specific doc build vsn in rtd req ([`5d4f953`](https://github.com/lanl/ThunderBoltz/commit/5d4f953363d49d6f258d7cb92d8626b112279fd8))
