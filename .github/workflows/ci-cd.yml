@@ -75,7 +75,7 @@ jobs:
         run: |
             git config user.name github-actions
             git config user.email github-actions@github.com
-            poetry run semantic-release version
+            poetry run semantic-release -v version
             # Store if
             if [ -d dist ]; then
               echo "RELEASE=true" >> "$GITHUB_ENV"
