@@ -78,7 +78,12 @@ Simulation parameters can be adjusted in the `N2vib.in` file for this example.
 ### Using the Python wrapper
 
 We also include a python wrapper that allows for automated compilation
-and extended input/output processing. To install the python API from the
+and extended input/output processing. To install the python API from
+the online python index (PYPI), run
+```
+pip install thunderboltz
+```
+To install the python API from the
 repository, run the `install.sh` script from the root directory:
 ```
 ./install.sh
