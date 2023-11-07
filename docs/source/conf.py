@@ -7,9 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "ThunderBoltz"
-copyright = "2023, Ryan Park"
 author = 'Ryan Park, Brett Scheiner, Mark Zammit'
-release = "0.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -35,6 +33,7 @@ extensions = [
     # RTD html theme
     "sphinx_rtd_theme",
 ]
+autoapi_dirs = ["../../src"]
 
 intersphinx_mapping = {
     "python": ("http://docs.python.org/", None),
