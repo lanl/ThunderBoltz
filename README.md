@@ -34,7 +34,7 @@ git clone https://github.com/lanl/ThunderBoltz.git
 ```
 The basic ThunderBoltz functionality will be available either
 as an executable in `bin/thunderboltz.bin` or can be compiled from the
-source in `src/thunderboltz`.
+source in `src/thunderboltz/cpp`.
 
 ## Usage
 
