@@ -22,7 +22,8 @@ cp docs/cpp_manual/cpp_manual.pdf cpp_manual.pdf
 
 # Build API html docs
 cd docs
-make html && open build/html/index.html
+sphinx-build -M html source build -D "html_theme=furo"
+open build/html/index.html
 # Build API latex docs
 make latexpdf
 cd ..

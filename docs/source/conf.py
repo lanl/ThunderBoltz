@@ -32,6 +32,8 @@ extensions = [
     "sphinx.ext.viewcode",
     # Link to external docs
     "sphinx.ext.intersphinx",
+    # RTD html theme
+    "sphinx_rtd_theme"
 ]
 
 intersphinx_mapping = {
@@ -48,14 +50,12 @@ exclude_patterns = []
 
 # autoclass_content = "class"
 
-
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "furo"
-html_static_path = ["_static"]
-html_css_files = ["custom.css"]
+html_theme = "sphinx_rtd_theme"
+# html_static_path = ["_static"]
+# html_css_files = ["custom.css"]
 
 # -- Latex options
 latex_elements = {
