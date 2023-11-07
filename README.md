@@ -19,6 +19,12 @@ and the Python API code manual is found in the home directory "api_manual.pdf".
 
 ## Installation
 
+### Pip Installation
+The Python API can be installed via `pip`.
+```
+pip install thunderboltz
+```
+
 ### Clone the repository
 
 Clone a local repository with the code. You may need to set up
