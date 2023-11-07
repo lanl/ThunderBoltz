@@ -2,6 +2,45 @@
 
 
 
+## v0.0.1 (2023-11-07)
+
+### Build
+
+* build: add thunderboltz to docs reqs ([`4d6c405`](https://github.com/lanl/ThunderBoltz/commit/4d6c4057c89efcd5cc926bcd1e7ec943997140ad))
+
+* build: require sphinx in text ([`ae00de4`](https://github.com/lanl/ThunderBoltz/commit/ae00de471135e2f3465f0d9a8096b918c31bfd4e))
+
+* build: fix release condition ([`6333e8d`](https://github.com/lanl/ThunderBoltz/commit/6333e8d5ab1722fdc0bb53ee3b56ca221ea0a8ea))
+
+* build: require release for CD step ([`03b4935`](https://github.com/lanl/ThunderBoltz/commit/03b4935cba040fb41f8645bc2c8171ad189ea225))
+
+### Documentation
+
+* docs: try version specific sphinx requirements ([`9f18cb7`](https://github.com/lanl/ThunderBoltz/commit/9f18cb7eb4bc097aadcdaaf035146314ab9ceba9))
+
+* docs: add requirements link in yml ([`d6befea`](https://github.com/lanl/ThunderBoltz/commit/d6befeacd16da64d3f8de50161cd194d7bc3fb2f))
+
+* docs: add pip install in readme ([`ae25d66`](https://github.com/lanl/ThunderBoltz/commit/ae25d66bc350a4a370462dfc5317cc6b207b31cc))
+
+* docs: add sphinx itself to RTD requirements ([`44dbe7c`](https://github.com/lanl/ThunderBoltz/commit/44dbe7cdb0ee8d4a41d3d9fba16ea920d67bb282))
+
+* docs: add RTD req.txt ([`4c8ce66`](https://github.com/lanl/ThunderBoltz/commit/4c8ce66f030ea28f0d17259f103d4b8179da2394))
+
+* docs: remove RTD extension ([`ab41489`](https://github.com/lanl/ThunderBoltz/commit/ab41489aece7a71dbf1663d3cf49d9cc6b78d567))
+
+* docs: remove rtd from requirements ([`cb83758`](https://github.com/lanl/ThunderBoltz/commit/cb83758fda716899f3f45c5938a73789ed7a56fc))
+
+* docs: use ReadTheDocs theme ([`9996ffa`](https://github.com/lanl/ThunderBoltz/commit/9996ffa0ec774f939cdabdbe52b42bf3fa1d281c))
+
+* docs: add requirements for ReadTheDocs ([`0c05d69`](https://github.com/lanl/ThunderBoltz/commit/0c05d6947165c3eeb14aac21cc305a054ff0b744))
+
+* docs: add readthedocs workflow ([`c15fe16`](https://github.com/lanl/ThunderBoltz/commit/c15fe162844fd0e4acdd533cd58538e20c4c5ea2))
+
+### Fix
+
+* fix(docs): include custom css ([`70c45d1`](https://github.com/lanl/ThunderBoltz/commit/70c45d117a607ca81f231fb9bd06f23b6ff88dfd))
+
+
 ## v0.0.0 (2023-11-06)
 
 ### Build
