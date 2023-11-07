@@ -41,7 +41,7 @@ pytest-cov = "^4.1.0"
 sphinx-rtd-theme = "^1.3.0"
 
 [tool.semantic_release]
-verions_toml = ["pyproject.toml:tool.poetry.version"]
+version_toml = ["pyproject.toml:tool.poetry.version"]
 branch = "main"
 changlog_file = "CHANGELOG.md"
 build_command = "poetry build"
