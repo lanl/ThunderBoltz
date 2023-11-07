@@ -2,6 +2,13 @@
 
 
 
+## v0.1.0 (2023-11-07)
+
+### Feature
+
+* feat(license): Correct license with version ([`6d0646f`](https://github.com/lanl/ThunderBoltz/commit/6d0646f29de29f4a9dbfec4acb12eec32e97f592))
+
+
 ## v0.0.1 (2023-11-07)
 
 ### Build
