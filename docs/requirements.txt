@@ -1,3 +1,4 @@
-sphinx
+sphinx==5.3.0
 sphinx-autoapi
+sphinx_rtd_theme==1.1.1
 sphinxcontrib-napoleon
