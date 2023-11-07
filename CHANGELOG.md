@@ -1,6 +1,42 @@
 # CHANGELOG
 
 
+
+## v0.1.1 (2023-11-07)
+
+### Build
+
+* build: fix typo in pyproject toml config
+
+cc ([`901d626`](https://github.com/lanl/ThunderBoltz/commit/901d6263e87a92cf089bdc989ae8a73fa0cc6e83))
+
+* build: debug release with verbose ([`f1a857f`](https://github.com/lanl/ThunderBoltz/commit/f1a857f79b25faa9188cc428bbcc4ffc1369d33d))
+
+* build: adjust python scipy requirements ([`61aba35`](https://github.com/lanl/ThunderBoltz/commit/61aba35248296f0ea9fdc85f81011ba707b2eb0c))
+
+* build: use compatible python version in RTD build ([`4e1df9e`](https://github.com/lanl/ThunderBoltz/commit/4e1df9ef507e2c0594c1db3fea5c14ea8242ffd2))
+
+* build: remove release spec from sphinx
+
+Add autoapi dir spec. ([`ca4bc1d`](https://github.com/lanl/ThunderBoltz/commit/ca4bc1d177e87463fcec373b348eeac9f9e276c8))
+
+* build: require thunderbolz in rtd reqs ([`fea855a`](https://github.com/lanl/ThunderBoltz/commit/fea855a39962db92e6fdb3a1c1de685882fcaf8b))
+
+### Documentation
+
+* docs: format readme ([`7d6b6b6`](https://github.com/lanl/ThunderBoltz/commit/7d6b6b6ad4d22b1b6dbdd7e823ebd3a5c75c3670))
+
+* docs: require napoleon build vsn ([`3a0f20f`](https://github.com/lanl/ThunderBoltz/commit/3a0f20f94f44f03568d9330e8803d46d016b7f65))
+
+* docs: require specific doc build vsn in rtd req ([`5d4f953`](https://github.com/lanl/ThunderBoltz/commit/5d4f953363d49d6f258d7cb92d8626b112279fd8))
+
+* docs: correct cpp source file loc in readme ([`409ae0a`](https://github.com/lanl/ThunderBoltz/commit/409ae0a47b9de83c6d2566f128b8223782d90cea))
+
+### Fix
+
+* fix: Update readme with pip install option ([`9fd94bc`](https://github.com/lanl/ThunderBoltz/commit/9fd94bc16e5d824ee0ecb34bb3cd0d68983ba701))
+
+
 ## v0.1.0 (2023-11-07)
 
 ### Feature
