@@ -4,6 +4,8 @@
 [![CI/CD](https://github.com/lanl/ThunderBoltz/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/lanl/ThunderBoltz/actions/workflows/ci-cd.yml)
 [![PyPI Latest Release](https://img.shields.io/pypi/v/thunderboltz.svg)](https://pypi.org/project/thunderboltz/)
 [![License - BSD 3-Clause](https://img.shields.io/pypi/l/thunderboltz.svg)](https://github.com/lanl/ThunderBoltz/blob/main/LICENSE)
+[![Documentation Status](https://readthedocs.org/projects/thunderboltz/badge/?version=latest)](https://thunderboltz.readthedocs.io/en/latest/?badge=latest)
+
 
 ThunderBoltz is a 0D Direct Simulation Monte-Carlo code for the calculation of transport
 coefficients and 0D gas modeling. This repository contains the ThunderBoltz C++ source code (C22063)
@@ -46,15 +48,13 @@ The basic ThunderBoltz functionality will be available either
 as an executable in `bin/thunderboltz.bin` or can be compiled from the
 source in `src/thunderboltz/cpp`. To install the Python interface, run the
 `install.sh` script from the root directory.
-
-.. code-block:: bash
-
-   ./install.sh
+```
+./install.sh
+```
 
 This will upgrade [pip](https://pypi.org/project/pip)
 and install specific versions of Python packages,
 so create an environment if you are concerned with Python package overwrite.
-
 
 ## Usage
 
