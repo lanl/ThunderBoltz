@@ -6,12 +6,16 @@ ThunderBoltz |release| Documentation
 
 This documentation includes some simple tutorials for using
 the ThunderBoltz plasma simulation package and a complete
-public API reference
+public API reference. 
 
 Installation
 ------------
+The Python API can be installed via `pip`.
+```
+pip install thunderboltz
+```
 
-For now, the code must be downloaded from a repository.
+The code can also be downloaded from a repository.
 Use the following command to clone the code into a local repository.
 
 .. code-block:: bash
