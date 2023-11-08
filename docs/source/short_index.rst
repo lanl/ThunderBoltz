@@ -11,25 +11,25 @@ of the input and output simulation parameters involved.
 Installation
 ------------
 The Python API can be installed via `pip`.
-```
-pip install thunderboltz
-```
 
-The code can also be downloaded from a repository.
+.. code-block:: bash
+
+   pip install thunderboltz
+
+The code can also be downloaded from the repository.
 Use the following command to clone the code into a local repository.
 
 .. code-block:: bash
 
-   git clone git@gitlab.com/Mczammit/thunderboltz.git
+   git clone git@github.com:lanl/ThunderBoltz.git
 
-You may need to set up SSH keys in order to access gitlab. See the
-`Gitlab SSH Guide <https://docs.gitlab.com/ee/user/ssh.html>`_ to
-set up access to GitLab repositories.
-
+You may need to set up SSH keys in order to access Github. See the
+`Github SSH Guide <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>`_
+to set up access to Github repositories.
 
 The basic ThunderBoltz functionality is available either
 as an executable in ``bin/thunderboltz.bin`` or can be compiled from the
-source in ``src/thunderboltz``. 
+source in ``src/thunderboltz/cpp``. 
 
 
 Compilation
