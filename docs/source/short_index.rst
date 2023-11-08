@@ -10,8 +10,12 @@ of the input and output simulation parameters involved.
 
 Installation
 ------------
+The Python API can be installed via `pip`.
+```
+pip install thunderboltz
+```
 
-For now, the code must be downloaded from a repository.
+The code can also be downloaded from a repository.
 Use the following command to clone the code into a local repository.
 
 .. code-block:: bash
