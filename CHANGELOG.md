@@ -2,6 +2,27 @@
 
 
 
+## v0.1.2 (2023-12-03)
+
+### Documentation
+
+* docs: add figures to quick start guide ([`e9a8cdc`](https://github.com/lanl/ThunderBoltz/commit/e9a8cdcf7a27342dcbc5ac36eb99e7980391e888))
+
+* docs: fix readme rst in md, add doc badge ([`1aded9b`](https://github.com/lanl/ThunderBoltz/commit/1aded9b12395915f45b98a9dbd3c1a510b92f36f))
+
+* docs: update docs with new repo location
+
+Also, add status badges to readme. ([`89f76c2`](https://github.com/lanl/ThunderBoltz/commit/89f76c20a9c79281ab7647ef39ad6b35444c5464))
+
+* docs: update html short index with pip inst. ([`290decd`](https://github.com/lanl/ThunderBoltz/commit/290decd0ac0d9b6b020362ce5c851925a4b1c85e))
+
+* docs: update html index with pip install ([`72b1faa`](https://github.com/lanl/ThunderBoltz/commit/72b1faa13acf636390bb06a1f2480777232396a4))
+
+### Fix
+
+* fix: add save option to rate figure ([`273cee4`](https://github.com/lanl/ThunderBoltz/commit/273cee48821c71ada0bdc22d2e925095be21819c))
+
+
 ## v0.1.1 (2023-11-07)
 
 ### Build
