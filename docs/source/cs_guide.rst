@@ -9,7 +9,7 @@ we used a built-in Helium cross section model. A more general approach
 to preparing cross sections is with the :class:`~.thunderboltz.CrossSections`
 object.
 
-Initializing the ``CrossSections`` Object
+Initializing the CrossSections Object
 -----------------------------------------
 
 There are three main ways to initialize a :class:`~.thunderboltz.CrossSections`
@@ -166,7 +166,7 @@ To view a plot of the cross section data, use the
 See the API reference for plotting related quantities with the
 :meth:`~thunderboltz.CrossSections.plot_cs` method.
 
-Attaching the ``CrossSections`` Object
+Attaching the CrossSections bject
 --------------------------------------
 
 Finally, attach the ``CrossSections`` object to the main ThunderBoltz

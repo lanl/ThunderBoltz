@@ -149,19 +149,40 @@ is finished like so:
    transport_params = timeseries[["MEe", "mobN", "a_n"]].copy()
 
 
-   # There are also some built-in plotting methods that
-   # can be accessed through the ThunderBoltz object.
+There are also some built-in plotting methods that can be accessed through the
+ThunderBoltz object.
+
+.. code-block:: python
 
    # This will plot step by step data for any of the output
    # parameters available in the time series table. Default
    # is mean energy, mobility, and Townshend ionization coefficient
    calc.plot_timeseries()
 
+.. image:: /_images/example_sim.png
+
+.. code-block:: python
+
    # This will plot the rate coefficients for every process.
    calc.plot_rates()
 
+.. image:: /_images/example_sim_rates.png
+
+.. code-block:: python
+
    # This will plot a joint plot of the electron velocity distribution function
    calc.plot_vdfs()
+
+..  image:: /_images/example_sim_xz.png
+
+.. download::
+
+
+
+In order to actually view plots in a GUI, make sure to call the matplotlib
+function ``show``, 
+
+.. code-block:: 
 
    # This will show a GUI and is required to actually display the plots.
    plt.show()
