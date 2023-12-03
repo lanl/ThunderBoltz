@@ -1342,6 +1342,16 @@ class ThunderBoltz(MPRunner):
             ax.set_ylabel("Rate Coefficient (m$^3$/s)")
             ax.set_xlabel("Time (s)")
 
+        if save:
+            # Save with the name of the simulation directory
+            sname = Path(self.directory).parts[-1]
+            if not os.path.isdir(save):
+                os.makedirs(save)
+            saveas = pjoin(save, sname+"_rates.pdf")
+            if v: print(f"Saving rate constants in {saveas}")
+            self.rate_fig.savefig(saveas)
+            plt.close(self.rate_fig)
+
         return self.rate_fig
 
 
