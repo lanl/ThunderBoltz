@@ -1194,6 +1194,16 @@ class ThunderBoltz(MPRunner):
         edf["E"] = edf.Ex + edf.Ey + edf.Ez
         return edf
 
+    def get_counts(self):
+        """Return the cumulative reaction counts for each process and
+        each time step.
+        
+        Returns:
+            :class:`pandas.DataFrame`: A table where each column corresponds to a
+            collision process and each row corresponds to a time step.
+        """
+        return self.counts
+
     def describe_dist(self, steps="last", sample_cap=500000):
         """Generate percentile and count statistics of the electron
         velocity / energy distribution for various time steps.
