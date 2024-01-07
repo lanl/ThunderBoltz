@@ -4,30 +4,30 @@ from os.path import join as pjoin
 import sys
 
 def add_laur(source, laur):
+    """Edit Sphinx Latex to include LAUR number on title page."""
     with open(source) as f:
         s = f.read()
     m = re.search(r"\\date", s)
     i = s.count("\n", 0, m.start())
     lines = s.split("\n")
     laur_str = f"LA-UR-{laur}"
-    print("FINDME", lines[i])
     lines[i] = lines[i][:-1] + r"\\" + laur_str + r"}"
-    print("FINDME", lines[i])
     with open(source, "w") as f:
         f.write("\n".join(lines))
 
 def set_title(source, title):
+    """Edit Sphinx Latex to include flexible title."""
     with open(source) as f:
         s = f.read()
     m = re.search(r"\\title", s)
     i = s.count("\n", 0, m.start())
     lines = s.split("\n")
     lines[i] = r"\title{" + title + r"}"
-    print("\n".join(lines))
     with open(source, "w") as f:
         f.write("\n".join(lines))
 
 def add_affiliation(source):
+    """Edit Sphinx Latex to include affiliation."""
     with open(source) as f:
         s = f.read()
     lines = s.split("\n")
@@ -47,19 +47,27 @@ def add_affiliation(source):
         f.write("\n".join(lines))
 
 def split_sphinx_table(latex_source, class_name, class_section, at):
+    """Parse latex script and split the table for a given subsection
+    at a given row of the table."""
     with open(latex_source) as f:
         lines = f.readlines()
     in_class = False
     in_section = False
     in_split_loc = False
     split_line = "NOT FOUND"
+    ttype = "tabulary"
+    add = "{\linewidth}[t]" # term for online the tabulary mode
 
     for i, l in enumerate(lines):
         # Find class location
         if "subsection" in l and class_name in l:
             in_class = True
-        if not in_class:
-            continue
+        if not in_class: continue
+
+        # Find table type (tabular or longtable)
+        if "longtable" in l:
+            ttype = "longtable"
+            add = ""
 
         # Find section location
         if "subsection" in l and class_section in l:
@@ -71,8 +79,10 @@ def split_sphinx_table(latex_source, class_name, class_section, at):
         if (all(s in l for s in ["hyperref", "detokenize", "api", at])
                 or ("sphinxcode" in l and at in l)):
             in_split_loc = True
-        if not in_split_loc:
-            continue
+        if not in_split_loc: continue
+
+        print("FIND !!!! ", i, ttype)
+
         if "end{tabulary}" in l:
             print("Exiting on already split table")
             # Don't split an already split method
@@ -82,13 +92,15 @@ def split_sphinx_table(latex_source, class_name, class_section, at):
             break
 
     if split_line == "NOT FOUND":
+        print("NOT FOUND")
         return
 
     split_str = (
        "\sphinxbottomrule\n"
-       "\end{tabulary}\n"
+       f"\\end{{{ttype}}}\n"
        "%%%%% SPLIT TABLE %%%%%\n"
-       "\\begin{tabulary}{\linewidth}[t]{\X{1}{2}\X{1}{2}}\n"
+       "\\newpage\n"
+       f"\\begin{{{ttype}}}{add}{{\X{{1}}{{2}}\X{{1}}{{2}}}}\n"
        "\sphinxtoprule\n"
        "\sphinxtableatstartofbodyhook\n"
     )
@@ -98,18 +110,12 @@ def split_sphinx_table(latex_source, class_name, class_section, at):
         f.write("".join(lines))
 
 def fix_doc_runoff():
+    """Fix Sphinx Latex issues leading to tables that run off the page."""
     path = pjoin("docs", "build", "latex")
     file =  "thunderboltz.tex"
     file_path = pjoin(path, file)
-    split_sphinx_table(file_path, "thunderboltz.ThunderBoltz", "Methods", "get_etrans")
+    split_sphinx_table(file_path, "thunderboltz.ThunderBoltz", "Methods", "get_counts")
     split_sphinx_table(file_path, "thunderboltz.parameters.WrapParameters", "Attributes", "duration")
-
-    og = os.getcwd()
-    os.chdir(path)
-    os.system(f"pdflatex {file}")
-    os.chdir(og)
-
-    os.system(f"open {file_path[:-3]+'pdf'}")
 
 def remove_member(src_path, class_name, class_section, member_name):
     with open(src_path) as f:

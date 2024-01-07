@@ -23,6 +23,13 @@ Output Parameters
    thunderboltz.parameters.OutputParameters
    thunderboltz.parameters.ParticleParameters
 
+Cumulative Reaction Counts
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If cumulative reaction counts are required, they can be accessed easily for
+each reaction with the :meth:`~.thunderboltz.ThunderBoltz.get_counts` method.
+This will return a :class:`~.pandas.DataFrame` where each column corresponds to
+a collision process and each row corresponds to a time step.
 
 .. _memory:
 
