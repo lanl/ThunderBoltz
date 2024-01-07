@@ -2,6 +2,19 @@
 
 
 
+## v0.2.0 (2024-01-07)
+
+### Documentation
+
+* docs: add open option for doc build file ([`5b35206`](https://github.com/lanl/ThunderBoltz/commit/5b3520626740bd47c55f1f3e4caf8552e6e720c9))
+
+* docs: add more references to cumulative counts ([`a7df529`](https://github.com/lanl/ThunderBoltz/commit/a7df529b87f899d339f3739439c7aa2b0a7584a1))
+
+### Feature
+
+* feat: add method get_counts() and docs ([`a23f110`](https://github.com/lanl/ThunderBoltz/commit/a23f11022d3e230deaf1f6db0e845561ed6e2a58))
+
+
 ## v0.1.2 (2023-12-03)
 
 ### Documentation
