@@ -20,10 +20,11 @@ pdflatex cpp_manual
 cd ../../
 cp docs/cpp_manual/cpp_manual.pdf cpp_manual.pdf
 
+
 # Build API html docs
 cd docs
 sphinx-build -M html source build
-open build/html/index.html
+
 # Build API latex docs
 make latexpdf
 cd ..
@@ -32,5 +33,8 @@ python docs/reformat_latex.py runoff add_afil \
     --title "ThunderBoltz API Manual" --laur "23-32356"
 cp docs/build/latex/thunderboltz.pdf api_manual.pdf
 # Open latex doc
-open api_manual.pdf
-open cpp_manual.pdf
+if [[ "$1" == "open" ]] ; then
+    open api_manual.pdf
+    open cpp_manual.pdf
+    open docs/build/html/index.html
+fi 
