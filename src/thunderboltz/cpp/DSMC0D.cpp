@@ -80,6 +80,8 @@ void ReportStatus(Particles *AllParticle, CrossSections *AllCrossSections, Input
     //Variables for output
     double Ke_electrons, ME_electrons;
     double Mii,Kii,Txii,Tyii,Tzii,Vxii,Vyii,Vzii,Rxi0,Ryi0,Rzi0,Nii;
+    double XX, YY, ZZ, XY, XZ, YZ;
+    double XVX, XVY, XVZ, YVX, YVY, YVZ, ZVX, ZVY, ZVZ;
 
     //Dump Particles
     DumpParticles(AllParticle, Parameters, step);
@@ -91,6 +93,26 @@ void ReportStatus(Particles *AllParticle, CrossSections *AllCrossSections, Input
         Rxi0 = CalculateMeanDisplacement(AllParticle, 0, 0);
         Ryi0 = CalculateMeanDisplacement(AllParticle, 1, 0);
         Rzi0 = CalculateMeanDisplacement(AllParticle, 2, 0);
+
+        // Calculate position correlations			
+	    XX=CalculateMeanRiRj(AllParticle,0,0,0);
+        YY=CalculateMeanRiRj(AllParticle,1,1,0);
+        ZZ=CalculateMeanRiRj(AllParticle,2,2,0);
+        XY=CalculateMeanRiRj(AllParticle,0,1,0);
+        XZ=CalculateMeanRiRj(AllParticle,0,2,0);
+		YZ=CalculateMeanRiRj(AllParticle,1,2,0);
+
+        // Calculation position/velocity correlations
+	    XVX=CalculateMeanRiVj(AllParticle,0,0,0);
+	    XVY=CalculateMeanRiVj(AllParticle,0,1,0);
+	    XVZ=CalculateMeanRiVj(AllParticle,0,2,0);
+	    YVX=CalculateMeanRiVj(AllParticle,1,0,0);
+	    YVY=CalculateMeanRiVj(AllParticle,1,1,0);
+	    YVZ=CalculateMeanRiVj(AllParticle,1,2,0);
+	    ZVX=CalculateMeanRiVj(AllParticle,2,0,0);
+	    ZVY=CalculateMeanRiVj(AllParticle,2,1,0);
+	    ZVZ=CalculateMeanRiVj(AllParticle,2,2,0);
+
         //Dump Fluid Quantities
         for(int ii=0;ii<Parameters->NUM_TYPES;ii++)
         {
@@ -108,12 +130,21 @@ void ReportStatus(Particles *AllParticle, CrossSections *AllCrossSections, Input
             Tzii = ComputeTemperature(AllParticle,Parameters,ii,2);
             if(step==0) {
                 outfile << "t , Ki , Mi , Ni , Vxi , Vyi , Vzi , Txi , Tyi , Tzi";
-                if (ii==0) { outfile << " , Rxi , Ryi , Rzi"; }
+                if (ii==0) { outfile << " , Rxi , Ryi , Rzi, XX, YY, ZZ, XY, XZ, YZ, XVX, XVY, XVZ, YVX, YVY, YVZ, ZVX, ZVY, ZVZ"; }
                 outfile << "\n";
             }
             outfile << step*Parameters->DT<<" , "<<Kii <<" , "<< Mii <<" , "<< Nii <<" , "<<Vxii<<" , "<<Vyii<<" , "<<Vzii<<" , "<<Txii<<" , "<<Tyii<<" , "<<Tzii;
-                // If writing to electron file
-            if (ii==0) { outfile << " , "<< std::setprecision(9) << Rxi0 << " , " << std::setprecision(9) << Ryi0 << " , " << std::setprecision(9) << Rzi0; }
+
+            // If writing to electron file
+            if (ii==0) {
+              outfile << " , "
+              << std::setprecision(9) << Rxi0 << " , " << std::setprecision(9) << Ryi0 << " , " << std::setprecision(9) << Rzi0<< " , "
+              << std::setprecision(9) << XX<< " , " << std::setprecision(9) << YY<< " , " << std::setprecision(9) << ZZ<< " , "
+              << std::setprecision(9) << XY<< " , " << std::setprecision(9) << XZ<< " , " << std::setprecision(9) << YZ<< " , "
+              << std::setprecision(9) << XVX<< " , " << std::setprecision(9) << XVY<< " , " << std::setprecision(9) << XVZ<< " , "
+              << std::setprecision(9) << YVX<< " , " << std::setprecision(9) << YVY<< " , " << std::setprecision(9) << YVZ<< " , "
+              << std::setprecision(9) << ZVX<< " , " << std::setprecision(9) << ZVY<< " , " << std::setprecision(9) << ZVZ;
+            }
             outfile <<"\n";
         }
 
@@ -353,6 +384,46 @@ double CalculateMeanDisplacement(Particles *particle_list, int axis, int type) {
     }
     r=r/N;
     return r;
+}
+
+// For bulk diffusion
+double CalculateMeanRiRj(Particles *particle_list, int axis1, int axis2, int type)
+{
+    double xi,xj,xy,N;
+    N=0.0;
+    xy=0.0;
+	for (unsigned long p=0;p<particle_list->np;p++)
+	{
+        if (particle_list->part[p].type == type)
+        {
+			xi=particle_list->part[p].r[axis1];
+			xj=particle_list->part[p].r[axis2];
+			xy+=xi*xj;
+			N+=1.0;
+        }
+	}
+	xy=xy/(N);
+	return xy;
+}
+
+// For flux diffusion
+double CalculateMeanRiVj(Particles *particle_list, int axis1, int axis2, int type)
+{
+    double xi, vj, xvy, N;
+    N=0.0;
+    xvy=0.0;
+	for (unsigned long p=0;p<particle_list->np;p++)
+	{
+        if (particle_list->part[p].type == type)
+        {
+			xi=particle_list->part[p].r[axis1];
+			vj=particle_list->part[p].v[axis2];
+			xvy+=xi*vj;
+			N+=1.0;
+        }
+	}
+	xvy=xvy/N;
+	return xvy;
 }
 
 /*computes species kinetic energy in electron volt*/

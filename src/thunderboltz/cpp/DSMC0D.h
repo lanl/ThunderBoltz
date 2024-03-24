@@ -130,7 +130,7 @@ double rnd();
 void ReportStatus(Particles *AllParticle, CrossSections *AllCrossSections, InputData *Parameters, int step);
 double SampleVel(double T, double mass);
 
-//include in future particle class
+// Include in future particle class
 void AddParticle(InputData *SimulationParam, Particles *particle_list,
                  double rx, double ry, double rz, double vx, double vy, double vz,
                  double charge, double mass, int type, int step);
@@ -146,30 +146,35 @@ double ComputeTemperature(Particles *particle_list, InputData *SimulationParam,i
 void DumpParticles(Particles *particle_list, InputData *Parameters, int step);
 int SlurmExit(int i, int NS);
 
-//include in future cross section class
+// Include in future cross section class
 void ReadCrossSection(InputData *SimulationParam, CrossSections *CrossSecList);
 void SampleVSigmaMax(Particles *particle_list, CrossSections *CrossSecList,int samples);
 void DumpReactionCounts(CrossSections *CrossSecList,int step);
 
 void DSMCcollideNTC(Particles *particle_list, CrossSections *CrossSecList, InputData *SimulationParam, int step);
 
-//collision models
+// Collision models
 void ElasticCollision(Particles *particle_list, unsigned long RandomParticleType1,
                       unsigned long RandomParticleType2, bool FixedHeavyParticle,
                       DifferentialCrossSection dcs);
 void InelasticCollision(Particles *particle_list, unsigned long RandomParticleType1,
                         unsigned long RandomParticleType2, double DeltaE, bool FixedHeavyParticle);
 void CXCollision(Particles *particle_list, unsigned long RandomParticleType1, unsigned long RandomParticleType2);
-//Helpers
+// Helpers
 unsigned int ReadTime(std::string g);
 void RotateFrame(double *v, double ct, double st, double cp, double sp);
 void Project(double *v, double cos_chi, double sin_chi, double cos_eta, double sin_eta);
 void vadd_scale(double *v, double *v1, double *v2, double scale);
 
-//Simulation parameters
+// Simulation parameters
 void ReadInput(std::string inputFileName, InputData *SimulationParam);
 void UpdateEField(InputData *SimulationParam, int step);
 
-//Differential distribution models
+// Differential distribution models
 double ParkElasticCollisionCosX(double eps, std::vector<double> a);
 double MurphyElasticCollisionCosX(double eps, std::vector<double> a);
+
+
+// For Diffusion
+double CalculateMeanRiRj(Particles *particle_list, int axis1, int axis2, int type);
+double CalculateMeanRiVj(Particles *particle_list, int axis1, int axis2, int type);
