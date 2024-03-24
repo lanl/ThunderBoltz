@@ -7,6 +7,7 @@ import shutil
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import scipy.constants as c
 
 import pickle
 import thunderboltz as tb
@@ -104,6 +105,52 @@ def onsager_relation():
 
     # Plot results once finished
     visualize.plot_onsager()
+
+def reid_ramp():
+    """Benchmark test for an inelastic cross section."""
+    # Model parameters
+    m_e = 5.4857e-4
+    m = 4
+    inel = Process("Inelastic",
+        cs_func=lambda e: 10e-20*(e-0.2) if e > .2 else 0,
+        threshold=0.2, name="Inelastic")
+
+    # Create collision processes
+    cross_sections = tb.CrossSections()
+    cross_sections.add_processes([
+        Process("ElasticFixedParticle2", cs_func=lambda e: 6e-20, name="Elastic"),
+        Process("InelasticFixedParticle2",
+            cs_func=lambda e: 10e-20*(e-0.2) if e > .2 else 0,
+            threshold=0.2, name="Inelastic"),
+    ])
+
+    calc = tb.ThunderBoltz(
+        cs=cross_sections,
+        NS=200000,
+        DT=2e-11,
+        L=1e-6,
+        NP=[100000, 100000],
+        TP=[0.0, 0.0],
+        MP=[m_e, m],
+        QP=[-1.0, 0],
+        monitor=True,
+    )
+
+    # Various E/n and B/n values
+    fields = [
+        [1, [0, 200]],
+        [12, [0, 1, 10, 50, 200, 500]],
+        [24, [0, 200]],
+    ]
+
+    # Run in parallel
+    # Loop through B/n values
+    with DistributedPool(calc) as pool:
+        for EN, BNs in fields:
+            for BN in BNs:
+                pool.submit(directory=setup_(subdir=f"{EN}Td_{BN}Hx"),
+                    Ered=EN, Bred=[0, BN, 0])
+
 
 def ikuta_sugai():
     """Test electron transport in crossed electric

@@ -1024,24 +1024,13 @@ class ThunderBoltz(MPRunner):
         ts = self.timeseries
         # Get numerical time series data
         tsn = ts.select_dtypes(include=[np.number]).reset_index(drop=True)
-        containment = 0. # (False)
-        endP = 30
-        std_bar = 10
-        if ss_func:
-            ts_last = ss_func(tsn).copy()
-        elif len(tsn) < 15:
-            # take last fourth
-            ts_last = tsn[tsn.index > 3*len(tsn)//4].copy()
-        else:
-            ts_last = tsn[tsn.index > 3*len(tsn)//4].copy()
-            end_ts = ts_last.iloc[-endP:,:]
-            es = end_ts.agg(["mean", "std"])
-            mEm = es.loc["mean", "MEe"]
-            mEs = es.loc["std", "MEe"]
-            # Calculate a rough indicator of convergence (fractional %)
-            contained = ts_last[(ts_last.MEe > mEm-std_bar*mEs) & (ts_last.MEe < mEm+std_bar*mEs)].copy()
-            containment = len(contained)/len(ts_last)
 
+        # Take last fourth
+        ts_last = tsn[tsn.index > 3*len(tsn)//4].copy()
+        # Unless user function is specified
+        if ss_func: ts_last = ss_func(tsn).copy()
+
+        # Must have steady state data
         if len(ts_last) < 1:
             raise RuntimeError("Not enough steps to generate steady-state statistics")
         # Set time step after which stats are generated
@@ -1067,9 +1056,6 @@ class ThunderBoltz(MPRunner):
         # Correct uncertainty in fit with stderr
         stats[mnbf+"_std"] = stats[mnbf]*LR.stderr/zdrift
         stats[anbf+"_std"] = stats[anbf]*LR.stderr/zdrift
-
-        # Save convergence criteria
-        stats["containment"] = containment
 
         # Add input / meta parameters
         stats = pd.DataFrame([stats], index=[0])
