@@ -68,7 +68,7 @@ class TBParameters(Parameters):
     #: (int) If ``1``, then the remainder of :math:`N_{\rm pairs}` is
     #: carried into the next :math:`N_{\rm pairs}` evaluation of the
     #: same process, default is ``1``.
-    CR=1
+    CR=0
     #: (list[str,int]) Optionally load particle velocities from a comma separated
     #: text file, default is ``None``; specify the name of the file at index
     #: ``0`` and the particle species index it applies to at index ``1``.
