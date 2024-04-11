@@ -290,15 +290,21 @@ class CrossSections(object):
         # Generate axes object if not provided
         if ax is None:
             _, ax = plt.subplots(figsize=(12, 10))
+
+        # Separate label from plot args if plotting multiple cross sections
+        label = ""
+        if "label" in plot_args:
+            label = "_" + plot_args["label"]
+            del plot_args["label"]
         # Loop through the processes
         for (csfile, B), color in zip(
                 self.table[["csfile", "B"]].values, styles.DCC):
-            pname = csfile.replace(".dat", "")
+            pname = csfile.replace(".dat", "") + label
             cs_dat = self.data[csfile]
             x = cs_dat[en]/B - 1 if thresholds else cs_dat[en]
             cs = (np.sqrt(2*cs_dat[en]*QE/ME)*cs_dat[csn]
                   if vsig else cs_dat[csn])
-            ax.plot(x, cs, label=pname, c=color)
+            ax.plot(x, cs, label=pname, c=color, **plot_args)
 
         # Setup axes settings
         ax.set_xscale("log")
