@@ -143,8 +143,8 @@ class ThunderBoltz(MPRunner):
         all_params.update(copy.deepcopy(params))
         # Remember initial init parameters
         self.initial_params = copy.deepcopy(params)
-        # Make empty CrossSections object
         self.cs = cs
+        # Make empty CrossSections object
         if cs is None:
             self.cs = CrossSections()
         # Set input for the first time
@@ -427,9 +427,9 @@ class ThunderBoltz(MPRunner):
             tb["NS"] = hp["duration"] // tb["DT"]
 
         if hp["Ered"] is not None:
-            # Calculate E-field in V/m such that particle 0
-            # is accelerated in the +z direction
-            tb["E"] = int(np.sign(tb["QP"][0]))*1e-21*hp["Ered"]*n_gas
+            # Calculate E-field in V/m such that an electron
+            # would be accelerated in the +z direction.
+            tb["E"] = -1e-21*hp["Ered"]*n_gas
 
         if hp["Bred"] is not None:
             if not isinstance(hp["Bred"], list):
@@ -449,7 +449,7 @@ class ThunderBoltz(MPRunner):
         SP = len(tb["QP"])
         if not SP == len(tb["MP"]):
             raise RuntimeError("QP and MP arguments do not match in length")
-        pass
+
         # All other multi-argument settings should not exceed these in length match SP parameter
         if any(len(tb[k]) > SP for k in ["NP", "TP"]):
             raise RuntimeError("Some multi-argument parameters do not match in length")
@@ -866,10 +866,11 @@ class ThunderBoltz(MPRunner):
             fpath = pjoin(self.directory, filename)
             if filename == "Counts.dat":
                 counts_dat = np.genfromtxt(fpath, delimiter=",")
-                if counts_dat.ndim == 1:
+                # If only one row of data, ensure 2D array
+                if counts_dat.ndim == 1 and len(counts_dat) == len(self.cs.table)+1:
                     counts_dat = counts_dat.reshape(1, -1)
                 self.counts = pd.DataFrame(counts_dat,
-                    columns =["step"]+self.cs.table.csfile.to_list())
+                    columns=["step"]+self.cs.table.csfile.to_list())
             elif filename == "thunderboltz.out":
                 self.read_stdout(filename)
             elif filename == "thunderboltz.log":
@@ -918,75 +919,161 @@ class ThunderBoltz(MPRunner):
             self.timeseries = pd.DataFrame()
             return self.timeseries
 
-
         # Create time series
-        self.timeseries = pt[0].join(kt.drop("t", axis=1), how="inner")
-        ts = self.timeseries
+        ts = self.timeseries = pt[0].join(kt.drop("t", axis=1), how="inner")
 
         # Add input and meta parameters
         self._tabulate(ts)
 
-        # Compute some additional parameters
-        DT = ts["t"].values[1] - ts["t"].values[0]
         # Calculate gas density
         ts["n_gas"] = self.tb_params["NP"][self.hp["gas_index"]]/ts.L**3
-        # Calculate Reduced field
+        # Calculate reduced field
         ts.loc[:, "mobN"] = ts.Vzi.abs()/ts.E.abs()*ts.n_gas
-        # Reduced Townshend ionization coefficient
 
+        # Compute some additional parameters
+        self.DT = ts["t"].values[1] - ts["t"].values[0]
+        # For convenience include electron z position in main time series
+        ts["Rzi"] = ts.Rzi
+
+        # Reaction rates
         self._calculate_rates()
+        # Diffusion rates
+        self._calculate_diffusion()
+        # Bulk swarm flows / reaction rates
+        self._calculate_bulk_rates()
 
+        # Calculate the reduced Townshend ionization coefficient
         ts["a_n"] = ts.k_i / ts.Vzi.abs()
-        # Calculate bulk parameters if position data is available
-        if "Rzi" in ts:
-            zdrift = np.abs(np.concatenate(([0], np.diff(ts.Rzi)/DT)))
-            ts["bulk_drift"] = zdrift
-            ts["Rzi"] = ts.Rzi
-            ts["mobN_bulk"] = zdrift/ts.E.abs()*ts.n_gas
-            ts["a_n_bulk"] = ts.k_i / zdrift
+
         return ts
 
-    def _calculate_rates(self):
-        """Calculate rate coefficients from reaction counts."""
-        ts = self.timeseries
+    def _calculate_rates(self, ts=None, ddt=None, std=False):
+        """Calculate rate coefficients from reaction counts.
+        These calculations require synchronization across different
+        ThunderBoltz output files, so the maximum amount of data available across
+        all files is used.
+        """
+        if ts is None: ts = self.timeseries
         pt = self.particle_tables
         c = self.counts.set_index("step")
+
+        # Mask counts and particle tables to match timeseries data
+        c = c[c.index >= ts["step"].min()].copy()
+        for i in range(len(pt)):
+            pt[i] = pt[i][pt[i]["t"] >= ts["t"].min()].copy()
 
         # Find the shortest list (if files are still being written by process)
         npoints = min(len(ts), *[len(p) for p in pt], len(c))
         # Truncate counts to the shortest
         c = c.iloc[:npoints].copy()
 
-        DT = ts["t"].values[1] - ts["t"].values[0]
+        # Default time derivative is forward difference estimator
+        if ddt is None: ddt = lambda x: (x.diff().fillna(0)/self.DT, 0*x)
 
         # Compute collision rate data
-        dcdt = (c-c.shift())/DT
+        dcdt, c_std = ddt(c)
+
         ctab = self.cs.table
         # Get ionization collision files.
         ionz_files = ctab.loc[(ctab.rtype.str.contains("Ionization"))
                              |(ctab.csfile.str.contains("ion")), "csfile"]
         ionz_c = c[ionz_files].copy()
         # Compute total ionization count
-        tot_ionz_c = ionz_c.sum(axis=1).values
+        tot_ionz_c = ionz_c.sum(axis=1)
         # Compute total interaction count over all processes
-        total_c = c.sum(axis=1).values
-        # For now use the most accurate time step values and assume constant DT
-        ionz_rate = np.concatenate(([0], np.diff(tot_ionz_c)/DT))
-        tot_rate = np.concatenate(([0], np.diff(total_c)/DT))
-
+        total_c = c.sum(axis=1)
+        ionz_rate, ionz_std = ddt(tot_ionz_c)
+        tot_rate, tot_std = ddt(total_c)
         # Generate specific rates for ionization and total processes
-        k_scale = 1/(ts.n_gas*ts.Ni*ts.L**3)
-        ts["k_i"] = ionz_rate*k_scale
-        ts["k_tot"] = tot_rate*k_scale
+        k_scale = 1/(ts.n_gas*ts.Ni*ts.L**3)[:npoints]
+        ts.loc[:npoints,"k_i"] = k_scale*ionz_rate
+        ts.loc[:npoints,"k_tot"] = k_scale*tot_rate
 
+        if std:
+            # Compute std data
+            ts.loc[:npoints,"k_i_std"] = k_scale*ionz_std
+            ts.loc[:npoints,"k_tot_std"] = k_scale*tot_std
+        
         # Generate rates for all processes individually
         for i, row in ctab.iterrows():
-            k_scaler = 1/(pt[row.r1].Ni * pt[row.r2].Ni * ts.L**3)[1:npoints]
-            k_scaler[k_scaler == np.inf] = 0
-            k_vals = (dcdt.iloc[1:npoints,i].values * k_scaler.values)
-            ts.loc[1:len(k_vals),f"k_{i+1}"] = k_vals
+            k_scale = 1/(pt[row.r1].Ni*pt[row.r2].Ni*ts.L**3)[:npoints]
+            k_scale[k_scale == np.inf] = 0
+            ts.loc[:npoints,f"k_{i+1}"] = k_scale*dcdt.iloc[:npoints,i]
+            if std:
+                # Compute std data per process
+                ts.loc[:npoints,f"k_{i+1}_std"] = k_scale*c_std.iloc[:npoints,i]
 
-    def get_ss_params(self, ss_func=None):
+    def _calculate_bulk_rates(self, ts=None, ddt=None, std=False):
+        """Calculate the bulk flow rates and the associated bulk
+        mobility and ionization coefficients."""
+
+        if ts is None: ts = self.timeseries
+        # Default time derivative is forward difference estimator
+        if ddt is None: ddt = lambda x: (x.diff().fillna(0)/self.DT, 0*x)
+
+        # Calculate bulk parameters
+        zdrift, zdrift_std = ddt(ts.Rzi)
+        ts["Wz"] = np.abs(zdrift)
+        ts["mobN_bulk"] = zdrift/ts.E.abs()*ts.n_gas
+        ts["a_n_bulk"] = ts.k_i / zdrift
+
+        if std:
+            ts["Wz_std"] = zdrift_std
+            ts["mobN_bulk_std"] = zdrift_std/ts.E.abs()*ts.n_gas
+            # Division of two uncertain parameters propagates error
+            # as s(A/B) = |A/B| * sqrt((s(A)/A)^2 + (s(B)/B)^2)
+            if "k_i_std" in ts:
+                ts["a_n_bulk_std"] = np.abs((ts.k_i/zdrift) * (zdrift_std/zdrift))
+            else:
+                ts["a_n_bulk_std"] = (np.abs(ts.k_i/zdrift)
+                  * np.sqrt((ts.k_i_std/ts.k_i)**2 + (zdrift_std/zdrift)**2))
+
+    def _calculate_diffusion(self, ts=None, ddt=None, std=False):
+        r"""Calculate the diffusion coefficients from position/velocity
+        correlation data.
+
+        Args:
+            ts (:class:`pandas.DataFrame`): Specify timeseries data
+                to calcaulte the diffusion rates for. Default is all time
+                series data.
+            ddt (callable): Specify a custom derivative method.
+            std (bool): Option to return standard deviation data propagated
+                through derivative opererations (i.e. if fits are used to compute slope values).
+
+        Note:
+            These diffusion calculation assume that the magnetic field is
+            oriented in the :math:`y`-direction. In particular, the Hall diffusion
+            is calculated using <xz> correlation data.
+        """
+        if ts is None: ts = self.timeseries
+
+        # Default to forward difference time derivative operator
+        if ddt is None: ddt = lambda x: (x.diff().fillna(0)/self.DT, 0*x)
+
+        # if not std: print(ts["ZZ"].head())
+        for axis in ["X", "Y", "Z"]:
+            # Compute on-axis bulk diffusion coefficients
+            R = ts[f"R{axis.lower()}i"]
+            dii, dii_std = ddt(1/2 * (ts[2*axis] - R**2))
+            ts[f"D_{axis}{axis}_bulk"] = dii
+            # Compute on-axis flux diffusion coefficients
+            V = ts[f"V{axis.lower()}i"]
+            RV = ts[f"{axis}V{axis}"]
+            ts[f"D_{axis}{axis}"] = RV - R*V
+
+            if std:
+                ts[f"D_{axis}{axis}_bulk_std"] = dii_std
+
+        # Compute hall diffusion
+        # fig, ax = plt.subplots()
+        dh, dh_std = ddt(ts["XZ"] - ts["Rxi"]*ts["Rzi"])
+        ts["D_H_bulk"] = dh
+        ts["D_H"] = ts["XVZ"] + ts["ZVX"] - ts["Rxi"]*ts["Vzi"] - ts["Rzi"]*ts["Vxi"]
+
+        if std:
+            ts["D_H_bulk_std"] = dh_std
+
+    def get_ss_params(self, ss_func=None, fits=False):
         """Get steady-state transport parameter values by averaging last section
         of time series. By default, the last fourth of the available data is
         considered to be steady-state. Standard deviations over this interval
@@ -994,10 +1081,19 @@ class ThunderBoltz(MPRunner):
         suffix added to the column name.
 
         Args:
-            ss_func (callable[:class:`pandas.DataFrame`, :class:`pandas.DataFrame`]):
-                A function that takes in the numerical time series data and returns a
-                truncated set of time series data that is considered to be at
-                steady state.
+            ss_func (callable[:class:`pandas.DataFrame`,
+                :class:`~.thunderboltz.parameters.TBParameters`]->:class:`pandas.DataFrame`):
+                A function that takes in numerical time series data and returns a
+                new frame with only data that is considered to be at steady state.
+                For example, ``ss_func=lambda df: df[df.t > 1e-6]`` would select only
+                times in the simulation after one microsecond for steady state
+                calculations, or ``ss_func=lambda df: df.iloc[50:,:]`` would select
+                the last 50 time steps.
+            fits (bool): Option to use a line of best fit over the steady state
+                window to calculate time dependent parameters (bulk swarm parameters
+                and rate coefficients).
+                rather than averaging derivatives with the forward difference formula.
+                ``True`` does so for all rate parameters. Default is False.
 
         Returns:
             :class:`pandas.DataFrame`: The aggregated steady-state data for
@@ -1013,8 +1109,9 @@ class ThunderBoltz(MPRunner):
             in steady-state by default when calculating these steady-state parameters.
             One can verify that this is true by viewing the figures produced by
             :py:func:`plot_timeseries`. Otherwise, one may run the simulation for longer,
-            or provide the appropriate criteria via ``ss_func``.
+            or provide the appropriate steady state criteria via ``ss_func``.
         """
+        # Require timeseries data
         if self.timeseries is None:
             ts = self.get_timeseries()
             if not len(ts):
@@ -1025,42 +1122,40 @@ class ThunderBoltz(MPRunner):
         # Get numerical time series data
         tsn = ts.select_dtypes(include=[np.number]).reset_index(drop=True)
 
-        # Take last fourth
-        ts_last = tsn[tsn.index > 3*len(tsn)//4].copy()
-        # Unless user function is specified
-        if ss_func: ts_last = ss_func(tsn).copy()
+        if ss_func: # Take user steady state function is specified
+            ts_last = ss_func(tsn, self).copy().reset_index(drop=True)
+        else: # Otherwise take last fourth
+            ts_last = tsn[tsn.index > 3*len(tsn)//4].copy().reset_index(drop=True)
 
         # Must have steady state data
-        if len(ts_last) < 1:
-            raise RuntimeError("Not enough steps to generate steady-state statistics")
+        require_ts = 3
+        if len(ts_last) < require_ts:
+            raise RuntimeError("Not enough steps to generate steady state statistics")
         # Set time step after which stats are generated
         self.time_conv = ts_last.t.values[0]
 
-        # Calculate time derivative based parameters
-        LR = linregress(ts_last.t, ts_last.Rzi)
-        zdrift = LR.slope
-        anbf = "a_n_bulk_fit"
-        mnbf = "mobN_bulk_fit"
-        ts_last[anbf] = ts_last.k_i / zdrift
-        ts_last[mnbf] = zdrift/ts_last.E.abs()*ts_last.n_gas
-        # Update time series with these parameters
-        ts.loc[ts.t >= self.time_conv, [anbf, mnbf]] = ts_last[[anbf, mnbf]]
+        if fits:
+            # Recalculate using fit method for time derivative calculations
+            self._calculate_rates(ts_last, ddt=self.compute_fit, std=True)
+            self._calculate_diffusion(ts_last, ddt=self.compute_fit, std=True)
+            self._calculate_bulk_rates(ts_last, ddt=self.compute_fit, std=True)
 
         # Calculate steady-state statistics by aggregating over time
-        stats = ts_last.agg(["mean", "std", lambda q: q.quantile(.9)])
-        stats = stats.drop(["t", "step"], axis=1)
-        stats = pd.concat((stats.loc["mean", :],
-                           stats.loc["std", :].add_suffix("_std"),
-        ), axis=0)
+        mean = ts_last.agg("mean")
+        std = ts_last[[c for c in ts_last if c+"_std" not in ts_last]].agg("std")
+        stats = pd.concat((mean, std.add_suffix("_std")), axis=0)
+        stats = stats.drop(["t", "step"])
 
-        # Correct uncertainty in fit with stderr
-        stats[mnbf+"_std"] = stats[mnbf]*LR.stderr/zdrift
-        stats[anbf+"_std"] = stats[anbf]*LR.stderr/zdrift
+        # Discard double aggregated _std_std columns 
+        stats = stats.drop([c for c in stats.index if "_std_std" in c])
 
         # Add input / meta parameters
         stats = pd.DataFrame([stats], index=[0])
         stats = self._tabulate(stats)
         return stats
+
+    def get_slope_fit():
+        pass
 
     def get_etrans(self):
         """Return the energy weighted counts of each reaction computed
@@ -1679,6 +1774,36 @@ class ThunderBoltz(MPRunner):
                 self.runtime_start = dat["runtime_start"]
                 self.runtime_end = dat["runtime_end"]
 
+    def compute_fit(self, x_):
+        """Get the slope and associated error of the line of best fit. If
+        x is a Dataframe, do so for each column."""
+        is_series = isinstance(x_, pd.Series)
+        # Rest index to normalize by DT instead of time
+        i = x_.index[0]
+        x = copy.deepcopy(x_).reset_index(drop=True)
+        if is_series: x = x.to_frame()
+        e = copy.deepcopy(x) # store errors 
+
+        for col in x:
+            # Linear model
+            lin = lambda v, a, b: a*v + b
+            t = x.index * self.DT 
+            popt, pcov = np.polyfit(t, x[col], 1, cov=True)
+            # Overwrite with slopes and errors, rescaled
+            x[col] = popt[0]
+            # Slope standard deviation is sqrt(Cov(a,a))
+            e[col] = np.sqrt(pcov[0][0])
+
+            # plt.plot(t, lin(t, *popt), label="fit")
+            # m_ = x.columns
+            # plt.title(f"{i} {m_} {self.tb_params['B']} {self.tb_params['E']}")
+            # plt.legend()
+            # plt.show()
+
+        # Return in same shape
+        if is_series: return to_series(x), to_series(e)
+        return x, e
+
 def read(directory, read_cs_data=False):
     """Create a ThunderBoltz object by reading from a
     ThunderBoltz simulation directory.
@@ -1853,3 +1978,9 @@ def infer_param_type(x):
             continue
     raise RuntimeError("No type satisfied by {x}")
 
+def to_series(df):
+    """Attempt to convert dataframe to series."""
+    if len(df.columns) > 1:
+        raise RuntimeError("Cannot convert multi-column DataFrame to Series.")
+    else:
+        return df.iloc[:,0]
