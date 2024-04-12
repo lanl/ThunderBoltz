@@ -22,10 +22,17 @@ from testing.utils import slurm_debug
 
 def test_get_timeseries():
     """Simplest TB setup."""
-    calc = TB(NS=200, **He_settings())
+    calc = TB(NS=300, **He_settings())
     calc.run()
     ts = calc.get_timeseries()
-    assert len(ts) == 3
+    assert len(ts) == 4
+
+def test_short_run():
+    """One line of time series."""
+    calc = TB(NS=10, **He_settings())
+    calc.run()
+    ts = calc.get_timeseries()
+    assert len(calc.counts) == 1
 
 def test_dryrun():
     """Run setup operations without running simulation."""
@@ -79,9 +86,9 @@ def test_ss_not_enough_steps():
 def test_ss_enough_steps():
     """Try to get steady state statistics on a run
     with very few steps"""
-    calc = TB(NS=1001, NP=[10, 2], **He_settings())
+    calc = TB(NS=1201, NP=[10, 2], **He_settings())
     calc.run()
-    sst = calc.get_ss_params()
+    sst = calc.get_ss_params(fits=False)
     assert len(sst) == 1
 
 def test_autostep():
@@ -794,3 +801,21 @@ def _test_plot_edfs():
     print(calc.describe_dist())
     calc.plot_edfs(steps="all", plot_cs=True)
 
+def test_ExB():
+    """In crossed electric and magnetic fields, the particles should drift in the
+    ExB direction, regardless of the sign of charge"""
+    calc = TB(DT=1e-4, NP=[1], TP=[0], NS=1000, Ered=100,
+              MP=[1], QP=[-1], Bred=[0, 1000, 0], cs=tb.CrossSections(),
+              directory=setup_(1))
+    calc.run()
+    pt = calc.get_particle_tables()
+    v1 = pt[0].Vxi.mean()
+
+    calc = TB(DT=1e-4, NP=[1], TP=[0], NS=1000, Ered=100,
+              MP=[1], QP=[1], Bred=[0, 1000, 0], cs=tb.CrossSections(),
+              directory=setup_(1))
+    calc.run()
+    pt = calc.get_particle_tables()
+    v2 = pt[0].Vxi.mean()
+
+    assert np.sign(v1) == np.sign(v2) == 1
