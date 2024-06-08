@@ -24,10 +24,7 @@ the rate constants :math:`k_{ij}` have the analytic solution
 
 .. math::
 
-    k(T)= 2d^2\left(\frac{2\pi k_B T}{m_r}\right)^{1/2}
-    \exp\left(
-        \frac{-E_a}{k_B T}\right)\left(1+\frac{E_a}{k_B T}
-    \right).
+    k(T) = d^2\sqrt{\frac{8 \pi k_{\textrm{B}}T}{m_r}} e^{-E_a/k_{\textrm{B}}T}.
 
 To run this system in in ThunderBoltz, run the prepared function either
 in a python script:
