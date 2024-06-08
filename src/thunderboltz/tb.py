@@ -435,7 +435,7 @@ class ThunderBoltz(MPRunner):
             if not isinstance(hp["Bred"], list):
                 raise RuntimeError("Please specify all three components of the "
                                    "reduced magnetic field.")
-            # Calculate absolute B-field in Gauss (1 Gauss = 1e23 Hx m^-3)
+            # Calculate absolute B-field in Tesla (1 Gauss = 1e23 Hx m^-3)
             tb["B"] = [1e-27*Bred_i*n_gas for Bred_i in hp["Bred"]]
 
         # Round NP if its not already an integer
@@ -968,7 +968,7 @@ class ThunderBoltz(MPRunner):
         c = c.iloc[:npoints].copy()
 
         # Default time derivative is forward difference estimator
-        if ddt is None: ddt = lambda x: (x.diff().fillna(0)/self.DT, 0*x)
+        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
 
         # Compute collision rate data
         dcdt, c_std = ddt(c)
@@ -986,22 +986,22 @@ class ThunderBoltz(MPRunner):
         tot_rate, tot_std = ddt(total_c)
         # Generate specific rates for ionization and total processes
         k_scale = 1/(ts.n_gas*ts.Ni*ts.L**3)[:npoints]
-        ts.loc[:npoints,"k_i"] = k_scale*ionz_rate
-        ts.loc[:npoints,"k_tot"] = k_scale*tot_rate
+        ts.loc[:npoints,"k_i"] = k_scale.values*ionz_rate.values
+        ts.loc[:npoints,"k_tot"] = k_scale.values*tot_rate.values
 
         if std:
             # Compute std data
-            ts.loc[:npoints,"k_i_std"] = k_scale*ionz_std
-            ts.loc[:npoints,"k_tot_std"] = k_scale*tot_std
+            ts.loc[:npoints,"k_i_std"] = k_scale.values*ionz_std.values
+            ts.loc[:npoints,"k_tot_std"] = k_scale.values*tot_std.values
         
         # Generate rates for all processes individually
         for i, row in ctab.iterrows():
             k_scale = 1/(pt[row.r1].Ni*pt[row.r2].Ni*ts.L**3)[:npoints]
             k_scale[k_scale == np.inf] = 0
-            ts.loc[:npoints,f"k_{i+1}"] = k_scale*dcdt.iloc[:npoints,i]
+            ts.loc[:npoints,f"k_{i+1}"] = k_scale.values*dcdt.iloc[:npoints,i].values
             if std:
                 # Compute std data per process
-                ts.loc[:npoints,f"k_{i+1}_std"] = k_scale*c_std.iloc[:npoints,i]
+                ts.loc[:npoints,f"k_{i+1}_std"] = k_scale.values*c_std.iloc[:npoints,i].values
 
     def _calculate_bulk_rates(self, ts=None, ddt=None, std=False):
         """Calculate the bulk flow rates and the associated bulk
@@ -1009,7 +1009,7 @@ class ThunderBoltz(MPRunner):
 
         if ts is None: ts = self.timeseries
         # Default time derivative is forward difference estimator
-        if ddt is None: ddt = lambda x: (x.diff().fillna(0)/self.DT, 0*x)
+        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
 
         # Calculate bulk parameters
         zdrift, zdrift_std = ddt(ts.Rzi)
@@ -1048,9 +1048,8 @@ class ThunderBoltz(MPRunner):
         if ts is None: ts = self.timeseries
 
         # Default to forward difference time derivative operator
-        if ddt is None: ddt = lambda x: (x.diff().fillna(0)/self.DT, 0*x)
+        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
 
-        # if not std: print(ts["ZZ"].head())
         for axis in ["X", "Y", "Z"]:
             # Compute on-axis bulk diffusion coefficients
             R = ts[f"R{axis.lower()}i"]
@@ -1426,7 +1425,6 @@ class ThunderBoltz(MPRunner):
                  not in k]
         for col in ts.columns:
             if not col.startswith("k_") or "i" in col: continue
-
             ax.plot(ts.t, ts[col], label=col)
             ax.legend(fontsize=10)
             ax.set_yscale("log")
