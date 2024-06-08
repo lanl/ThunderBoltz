@@ -81,8 +81,6 @@ def split_sphinx_table(latex_source, class_name, class_section, at):
             in_split_loc = True
         if not in_split_loc: continue
 
-        print("FIND !!!! ", i, ttype)
-
         if "end{tabulary}" in l:
             print("Exiting on already split table")
             # Don't split an already split method
@@ -116,6 +114,7 @@ def fix_doc_runoff():
     file_path = pjoin(path, file)
     split_sphinx_table(file_path, "thunderboltz.ThunderBoltz", "Methods", "get_counts")
     split_sphinx_table(file_path, "thunderboltz.parameters.WrapParameters", "Attributes", "duration")
+    split_sphinx_table(file_path, "thunderboltz.parameters.OutputParameters", "Attributes", "k\_ion")
 
 def remove_member(src_path, class_name, class_section, member_name):
     with open(src_path) as f:

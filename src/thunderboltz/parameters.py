@@ -241,11 +241,35 @@ class OutputParameters(Parameters):
     #: included in the output tables.
     k_1=0.
 
+    #: (float) The diagonal components of the flux diffusion tensor
+    #: :math:`\overleftrightarrow{\boldsymbol{D}}^f = \langle \boldsymbol{r} \boldsymbol{v} \rangle - \langle \boldsymbol{r} \rangle \langle \boldsymbol{v} \rangle`
+    #: are output under ``D_XX``, ``D_YY``, and ``D_ZZ``.
+    D_XX=0.
+    #: (float) The hall components of the flux diffusion tensor
+    #: :math:`\overleftrightarrow{\boldsymbol{D}}^f = \langle \boldsymbol{r} \boldsymbol{v} \rangle - \langle \boldsymbol{r} \rangle \langle \boldsymbol{v} \rangle`
+    #: are combined into the flux Hall diffusion :math:`D^f_{\text{H}} = D^f_{xz} + D^f_{zx}`.
+    D_H=0.
+    #: (float) The diagonal components of the bulk diffusion tensor
+    #: :math:`\overleftrightarrow{\boldsymbol{D}}^b = \frac{1}{2} \frac{\text{d}}{\text{d}t}\langle (\boldsymbol{r} - \langle \boldsymbol{r})^2 \rangle`
+    #: are output under ``D_XX_bulk``, ``D_YY_bulk``, and ``D_ZZ_bulk``.
+    D_XX_bulk=0.
+    #: (float) The hall components of the bulk diffusion tensor
+    #: :math:`\overleftrightarrow{\boldsymbol{D}}^b = \frac{1}{2} \frac{\text{d}}{\text{d}t}\langle (\boldsymbol{r} - \langle \boldsymbol{r})^2 \rangle`
+    #: are combined into the bulk Hall diffusion :math:`D^b_{\text{H}} = D^b_{xz} + D^b_{zx}`.
+    D_H_bulk=0.
+
 class ParticleParameters(Parameters):
     """A listing of species dependent properties that can be accessed by
     :meth:`~.thunderboltz.ThunderBoltz.get_particle_tables`, which returns a
     list of data tables (one for each species) where each column of data is
     labeled with one of the following keywords."""
+    #: (int) The number of time steps elapsed in the simulation, with
+    #: ``t`` :math:`=0` corresponding to ``step`` :math:`=0`.
+    step=0
+    Ni=0.0 #: (float) The number density (m :math:`^{-3}`).
+    Ki=0.0 #: (float) The total kinetic energy (eV).
+    Mi=0.0 #: (float) The mean kinetic energy (eV).
+    t=0. #: (float) The time (s) elapsed in the simulation.
     Rxi=0. #: (float) The mean x component of all particle displacements (m).
     Ryi=0. #: (float) The mean y component of all particle displacements (m).
     Rzi=0. #: (float) The mean z component of all particle displacements (m).
@@ -255,13 +279,14 @@ class ParticleParameters(Parameters):
     Txi=0. #: (float) The mean x component temperature (eV).
     Tyi=0. #: (float) The mean y component temperature (eV).
     Tzi=0. #: (float) The mean z component temperature (eV).
-    Ni=0.0 #: (float) The number density (m :math:`^{-3}`).
-    Ki=0.0 #: (float) The total kinetic energy (eV).
-    Mi=0.0 #: (float) The mean kinetic energy (eV).
-    t=0. #: (float) The time (s) elapsed in the simulation.
-    #: (int) The number of time steps elapsed in the simulation, with
-    #: ``t`` :math:`=0` corresponding to ``step`` :math:`=0`.
-    step=0
+    #: (float) All 6 components of the symmetric correlation tensor
+    #: :math:`\langle \boldsymbol{r} \boldsymbol{r} \rangle`  are output under
+    #: ``XX``, ``YY``, ``ZZ``, ``XY``, ``XZ``, and ``YZ``.
+    XX=0.
+    #: (float) All 9 components of the position / velocity correlation tensor
+    #: :math:`\langle \boldsymbol{r} \boldsymbol{v} \rangle` are output under
+    #: ``XYX``, ``XVY``, ``XVZ``, ``YVX``, ``YVY``, ``YVZ``, ``ZVX``, ``ZVY``, and ``ZVZ``.
+    XVX=0.
 
 tb_parameters = TBParameters().get_params()
 wrap_parameters = WrapParameters().get_params()
