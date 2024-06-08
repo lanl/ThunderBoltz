@@ -50,9 +50,15 @@ def plot_He_transport():
         return row["name"]
 
     dat["series"] = dat.apply(create_series_labels, axis=1)
-    legend_ordering = [7, 8, 0, 1, 9, 10, 2, 3, 4, 5, 6, 11, 12, 13, 14]
+
+    dat = dat[~dat.name.map(lambda s: any(s_ in s for s_ in ["Townsend", "Davies", "Chanin"]))].copy()
+
+
+    # legend_ordering = [7, 8, 0, 1, 9, 10, 2, 3, 4, 5, 6, 11, 12, 13, 14]
+    legend_ordering = [5, 6, 0, 1, 7, 8, 2, 3, 4, 11, 9, 10]
     x0, x_width = 0.52, 0.48
-    inset_bounds = [[[x0, .09, x_width, .5]], [None]]
+    # inset_bounds = [[[x0, .09, x_width, .5]], [None]]
+    inset_bounds = [[None], [None]]
 
     p = tb.plotting.pdplot.PandaPlot(dat, x=x, y=y, err_bars=errs, series="series", remove_ext=True,
         legend_style="figure bottom", xscale="log", yscale="log", label_map=styles.label_maps,
@@ -60,19 +66,19 @@ def plot_He_transport():
         load_spacing_config=False, legend_ordering=legend_ordering, config_dir="simulations", inset_bounds=inset_bounds,
         name="He_transport", snapx=True)
 
-    p.fig.subplots_adjust(left=0.162, bottom=.41, top=0.99, hspace=0.05)
-    p.fig.set_size_inches(11/1.49, 24/1.49)
+    p.fig.subplots_adjust(left=0.129, bottom=.39, top=0.99, hspace=0.05, right=.99)
+    p.fig.set_size_inches(11/1.49, 21/1.49)
     p.axs[0][0].xaxis.set_tick_params(labelbottom=False)
-    p.axs[1][0].set_xlim(.9, 1800)
-    p.axs[0][0].set_xlim(.9, 1800)
-    p.axs[1][0].set_ylim(1.5, 7)
-    p.axs[0][0].set_ylim(.0001, 10)
+    p.axs[1][0].set_xlim(9.5, 1800)
+    p.axs[0][0].set_xlim(9.5, 1800)
+    p.axs[1][0].set_ylim(1.5, 5.95)
+    p.axs[0][0].set_ylim(.25, 10)
     p.axs[1][0].set_yscale("linear")
 
     x1 = invert_coords(p.axs[0][0], x0, 0)[0]
     x2 = invert_coords(p.axs[0][0], x0+x_width, 0)[0]
-    p.inset_axs[0][0].set_xlim(x1, x2)
-    p.inset_axs[0][0].set_ylim(.1, 6)
+    # p.inset_axs[0][0].set_xlim(x1, x2)
+    # p.inset_axs[0][0].set_ylim(.1, 6)
 
     p.save("simulations")
     os.system("open simulations/He_transport.pdf")
@@ -88,7 +94,6 @@ def rate_comp():
     rate_std = [k+"_std" for k in rate_keys]
     all_keys = ["name", "growth", "Ered"]+rate_keys+rate_std
 
-
     data_store = pd.read_csv(pjoin("simulations", "He_rate_data.csv")) 
     bols_dat = data_store[data_store.name == "Bolsig"].copy()
 
@@ -101,7 +106,6 @@ def rate_comp():
       & (dat.eesd!="Equal")
       & ~dat.growth.isin([1])
     )].copy()
-
 
     id_keys = [k for k in dat.columns if k not in rate_keys]
     m1 = pd.melt(dat, id_keys, rate_keys, var_name="Reaction #", value_name="k")
@@ -306,7 +310,6 @@ def view_all_plots():
     calc.plot_edf_comps()
 
     plt.show()
-
 
 # Helpers
 
