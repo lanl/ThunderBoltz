@@ -166,7 +166,7 @@ To view a plot of the cross section data, use the
 See the API reference for plotting related quantities with the
 :meth:`~thunderboltz.CrossSections.plot_cs` method.
 
-Attaching the CrossSections bject
+Attaching the CrossSections Object
 --------------------------------------
 
 Finally, attach the ``CrossSections`` object to the main ThunderBoltz

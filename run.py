@@ -36,32 +36,32 @@ def onsager_relation():
     # Initialize cross sections
     cross_sections = tb.CrossSections()
     # Make the processes
-    # Some processes have a threshold energy of 1eV
-    activated = lambda cs: (lambda e: cs if e > 1 else 0)
-    # Others are constant
-    const = lambda cs: (lambda e: cs)
+    # forward / reverse processes are chosen to satisfy a microscopic
+    # reversibility criteria and have the following form (Klein-Rosseland
+    # condition).
+    forward = lambda cs, thresh: (lambda e: cs*(1-thresh/e) if e > thresh else 0)
+    reverse = lambda cs: (lambda e: cs)
 
     # Create general process constructors
-
     # These have varying species and cross sections
     chem_proc = lambda i, j, cs_func, thresh: Process("InelasticChangeParticle2",
         0, i, 0, j, threshold=thresh, cs_func=cs_func, name=f"{sp[i]}+X->{sp[j]}+X")
     # These have constant cross sections and unchanging species.
     nonchem_proc_1 = lambda i, j: Process("Elastic",
-        i, j, i, j, cs_func=const(1e-20), name=f"{sp[i]}+{sp[j]}->{sp[i]}+{sp[j]}")
+        i, j, i, j, cs_func=lambda e: 1e-20, name=f"{sp[i]}+{sp[j]}->{sp[i]}+{sp[j]}")
     nonchem_proc_100 = lambda i, j: Process("Elastic",
-        i, j, i, j, cs_func=const(1e-18), name=f"{sp[i]}+{sp[j]}->{sp[i]}+{sp[j]}")
+        i, j, i, j, cs_func=lambda e: 1e-18, name=f"{sp[i]}+{sp[j]}->{sp[i]}+{sp[j]}")
 
     cross_sections.add_processes([
         # A <-> B
-        chem_proc(1, 2, activated(1e-20), 1.0),
-        chem_proc(2, 1, const(1e-20), -1.0),
+        chem_proc(1, 2, forward(1e-20, 1.0), 1.0),
+        chem_proc(2, 1, reverse(1e-20), -1.0),
         # B <-> C
-        chem_proc(2, 3, activated(2e-20), 1.0),
-        chem_proc(3, 2, const(2e-20), -1.0),
+        chem_proc(2, 3, forward(2e-20, 1.0), 1.0),
+        chem_proc(3, 2, reverse(2e-20), -1.0),
         # A <-> C
-        chem_proc(1, 3, activated(2e-20), 1.0),
-        chem_proc(3, 1, const(3e-20), -1.0),
+        chem_proc(1, 3, forward(3e-20, 2.0), 2.0),
+        chem_proc(3, 1, reverse(3e-20), -2.0),
         # Non reacting processes (every combo of species thermally interact)
         nonchem_proc_1(0, 0),
         nonchem_proc_100(0, 1),
@@ -101,7 +101,7 @@ def onsager_relation():
 
     # Run the simulation
     # File writing will be invoked here
-    calc.run(std_banner=False, live=False)
+    calc.run(std_banner=False, live=False, live_rate=False)
 
     # Plot results once finished
     visualize.plot_onsager()

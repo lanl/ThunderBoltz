@@ -119,16 +119,16 @@ void InelasticCollision(Particles *particle_list, unsigned long RandomParticleTy
     double vb = vr*sinX*cos(eps);
     double wc = vr*sinX*sin(eps);
 
-	particle_list->part[RandomParticleType1].v[0]=  ucmf + (m2*divisor)*ua;
-	particle_list->part[RandomParticleType1].v[1]=  vcmf + (m2*divisor)*vb;
-	particle_list->part[RandomParticleType1].v[2]=  wcmf + (m2*divisor)*wc;
+	particle_list->part[RandomParticleType1].v[0] =  ucmf + (m2*divisor)*ua;
+	particle_list->part[RandomParticleType1].v[1] =  vcmf + (m2*divisor)*vb;
+	particle_list->part[RandomParticleType1].v[2] =  wcmf + (m2*divisor)*wc;
 
-	if(FixedHeavyParticle){ }
+	if(FixedHeavyParticle) {}
 	else
 	{
-		particle_list->part[RandomParticleType2].v[0]= ucmf - (m1*divisor)*ua;
-		particle_list->part[RandomParticleType2].v[1]= vcmf - (m1*divisor)*vb;
-		particle_list->part[RandomParticleType2].v[2]= wcmf - (m1*divisor)*wc;
+		particle_list->part[RandomParticleType2].v[0] = ucmf - (m1*divisor)*ua;
+		particle_list->part[RandomParticleType2].v[1] = vcmf - (m1*divisor)*vb;
+		particle_list->part[RandomParticleType2].v[2] = wcmf - (m1*divisor)*wc;
 	}
 }
 

@@ -1,6 +1,7 @@
 """Create specific plots relevant to the ThunderBoltz paper."""
 import itertools
 import os
+import sys
 from os.path import join as pjoin
 
 import matplotlib.pyplot as plt
@@ -124,7 +125,6 @@ def rate_comp():
     y = ["k"]
     errs = {"k": "k_std"}
 
-
     p = pdplot.PandaPlot(dat, x=x, y=y, err_bars=errs, series=ML, multi_legend=True,
         yscale="log", label_map=styles.label_maps, value_map=styles.value_maps,
         legend_style="figure right", series_styles=ss, name=name, snapx=True)
@@ -181,22 +181,37 @@ def plot_onsager():
     sp = ["X", "A", "B", "C"]
 
     # Grab the densities
+    n0 = ts["Ni"]
     ns = pd.concat([calc.particle_tables[i]["Ni"]
                      for i in range(1, 4)], axis=1)
+    # And the energies
+    es = pd.concat([calc.particle_tables[i]["Mi"]
+                     for i in range(0, 4)], axis=1)
     # Rename columns
     ns.columns = ["$n_A$", "$n_B$", "$n_C$"]
+    es.columns = [r"$\langle{E\rangle}" + f"_{l}$" for l in "XABC"]
 
     # Create figure
-    fig, axs = plt.subplots(3, 1, figsize=(7.4, 11.8))
+    fig, axs = plt.subplots(4, 1, figsize=(7.4, 11.8))
     axs[0].set_ylabel("Density (10$^{22}$/m$^3$)")
     axs[1].set_ylabel("$k_{ij}$ (10$^{-16}$m$^3$/s)")
     axs[2].set_ylabel("$n_ik_{ij}$ (10$^6$/s)")
-    axs[2].set_xlabel("Time ($\mu$s)")
+    axs[3].set_ylabel(r"$\langle{E\rangle}$ (eV)")
+    axs[3].set_xlabel("Time ($\mu$s)")
 
     # Plot densities
     for n_key in ns:
         axs[0].plot(ts.t*1e6, ns[n_key]*1e-22, label=n_key)
-        axs[0].legend(fontsize=25, loc="upper right")
+        axs[0].legend(loc="upper right", fontsize=12)
+
+
+    # Plot energies
+    # Weighted average over all species
+    av = (n0*es.iloc[:,0] + (ns*es.iloc[:,1:]).sum(axis=1)) / (n0+ns.sum(axis=1))
+    for e_key in es.iloc[:,1:]:
+        axs[3].plot(ts.t*1e6, es[e_key], label=e_key)
+    axs[3].plot(ts.t*1e6, es.iloc[:,0], c="black", label=r"$\langle{E\rangle}_{X}$")
+    axs[3].legend(loc="upper right", fontsize=12)
 
     # Select the processes with a particle type change
     reacting = tab[tab.p2 != tab.r2].copy()
@@ -210,14 +225,15 @@ def plot_onsager():
     mr = AMU_TO_KG * (14. / 2)
     kbT = 1.
     # the rate formula in terms of cross section area, activation energy
-    k = lambda A, Ea: 2*A/np.pi*(2*np.pi*kbT*QE / mr)**(1/2) * np.exp(-Ea/kbT) * (1 + Ea/kbT)
+    kf = lambda A, Ea: A*np.sqrt(8*kbT*QE/(np.pi*mr)) * np.exp(-Ea/kbT)
+    kr = lambda A: A*np.sqrt(8*kbT*QE/(np.pi*mr))
     analytic_ks = {
-        (1, 2): k(1e-20, 1.),
-        (2, 1): k(1e-20, 0),
-        (2, 3): k(2e-20, 1.),
-        (3, 2): k(2e-20, 0),
-        (1, 3): k(2e-20, 1.),
-        (3, 1): k(3e-20, 0),
+        (1, 2): kf(1e-20, 1.),
+        (2, 1): kr(1e-20),
+        (2, 3): kf(2e-20, 1.),
+        (3, 2): kr(2e-20),
+        (1, 3): kf(3e-20, 2.),
+        (3, 1): kr(3e-20),
     }
 
     # Plot the rate coefficients and the absolute rates.
@@ -236,12 +252,11 @@ def plot_onsager():
         axs[2].plot(ts.t*1e6, ns[n_i]*ts[f"k_{i+1}"]*1e-6, label=n_i+label, c=c, **style)
 
     axs[1].plot([], [], c="black", ls=(0, (3, 1, 1, 1)), lw=2, label="benchmark")
-    axs[2].legend(fontsize=19, loc="upper right")
-    axs[1].legend(fontsize=16, loc="upper right")
+    axs[2].legend(loc="upper right", fontsize=10)
+    axs[1].legend(loc="upper right", fontsize=8.35)
 
-    fig.subplots_adjust(top=0.97, bottom=0.08, left=0.16)
+    fig.subplots_adjust(top=0.97, bottom=0.08, left=0.16, )
     fig.savefig(pjoin("simulations", "onsager_relation.pdf"))
-
 
 def plot_ikuta_sugai():
     """Generate a velocity moment profile at various
