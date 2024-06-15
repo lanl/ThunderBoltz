@@ -27,7 +27,16 @@ int main(int argc, char *argv[])
     CrossSections AllCrossSections;
     /*Read Cross Sections From Input*/
     ReadCrossSection(&Parameters , &AllCrossSections);
-    /*load particles*/
+
+    /*Initialize E Field*/
+    if (Parameters.Efreq!=0.0)
+    {
+        UpdateEFieldOsc(&Parameters,0);
+    } else if (Parameters.Epulse[1] != 0.0) {
+        UpdateEFieldPulse(&Parameters, 0);
+    }
+
+    /*Load particles*/
     InitializeParticles(&AllParticle,&Parameters);
 
     //Calculate square of B field
@@ -43,7 +52,9 @@ int main(int argc, char *argv[])
 
         if (Parameters.Efreq!=0.0)
         {
-            UpdateEField(&Parameters,i);
+            UpdateEFieldOsc(&Parameters,i);
+        } else if (Parameters.Epulse[1] != 0.0) {
+            UpdateEFieldPulse(&Parameters, i);
         }
 
         // Update displacement analytically, only track the
@@ -1070,11 +1081,20 @@ void DumpReactionCounts(CrossSections *CrossSecList,int step)
 
 }
 
-void UpdateEField(InputData *SimulationParam, int step)
+void UpdateEFieldOsc(InputData *SimulationParam, int step)
 {
     double Enew;
     Enew=SimulationParam->Emag*sin(SimulationParam->Efreq*2.0*PI*step*SimulationParam->DT);
     SimulationParam->E=Enew;
+}
+
+void UpdateEFieldPulse(InputData *SimulationParam, int step)
+{
+    double t = step*SimulationParam->DT;
+    double Emax = SimulationParam->Emag;
+    double *p = SimulationParam->Epulse;
+    SimulationParam->E=Emax*exp(-0.5 * pow((t-p[0])/p[1],2));
+    // printf("WOAH %e %e %e %e %e\n", t, Emax, p[0], p[1], SimulationParam->E);
 }
 
 unsigned int ReadTime(std::string line) {

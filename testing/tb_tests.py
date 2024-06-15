@@ -819,3 +819,11 @@ def test_ExB():
     v2 = pt[0].Vxi.mean()
 
     assert np.sign(v1) == np.sign(v2) == 1
+
+def test_E_pulse():
+    """Create a Gaussian model of an E field pulse."""
+    calc = TB(NS=3000, DT=1e-10, OS=10, EP=[2e-7, 1e-8], **He_settings())
+    calc.run()
+    calc.plot_timeseries(series=["E", "k_ion", "k_8"])
+    ts = calc.get_timeseries()
+    # assert len(ts) == 4

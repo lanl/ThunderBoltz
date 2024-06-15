@@ -3,6 +3,8 @@ void ReadInput(std::string inputFileName, InputData *SimulationParam)
 	SimulationParam->E=0.0;
 	SimulationParam->Emag=0.0;
 	SimulationParam->Efreq=0.0;
+	SimulationParam->Epulse[0]=0.0;
+	SimulationParam->Epulse[1]=0.0;
 	SimulationParam->B[0]=0.0;
 	SimulationParam->B[1]=0.0;
 	SimulationParam->B[2]=0.0;
@@ -41,6 +43,14 @@ void ReadInput(std::string inputFileName, InputData *SimulationParam)
 			printf("reading electric frequency: %e (Hz)\n", f);
 			SimulationParam->Efreq=f;
 		}
+        if(Index=="EP"){
+            double offset, width;
+            file >> offset >> width;
+            printf("reading electric field pulse offset: %e (t)", offset);
+            printf("reading electric field pulse standard deviation: %e (t)", width);
+            SimulationParam->Epulse[0] = offset;
+            SimulationParam->Epulse[1] = width;
+        }
 		if(Index=="B"){
 			double Bx,By,Bz;
 			file >> Bx >> By >> Bz ; 

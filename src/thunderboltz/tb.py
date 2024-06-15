@@ -1713,12 +1713,14 @@ class ThunderBoltz(MPRunner):
         """Add params to DataFrame."""
         # Log inputs into table format
         for p, v in self.tb_params.items():
+            if p in df: continue # Don't overwrite data with clashing keys
             if isinstance(v, list):
                 df.loc[:, p] = " ".join(str(t) for t in v)
             else:
                 df.loc[:, p] = v
         # Log meta params into table format
         for p, v in self.hp.items():
+            # Prefer certain params from tb data
             if isinstance(v, list):
                 df.loc[:, p] = " ".join(str(t) for t in v)
             elif isinstance(v, dict):

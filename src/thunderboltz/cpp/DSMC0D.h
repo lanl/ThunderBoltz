@@ -103,6 +103,7 @@ struct InputData
 	double E;   //Electric Field
 	double Efreq; //Frequency of E field oscillation
 	double Emag; //E field Magnitude
+    double Epulse[2]; // E field pulse standard deviation
 	double B[3];   // Magnetic Field
 	int NUM_TS; //Number of time steps
 	double DT;				// time step size
@@ -168,7 +169,8 @@ void vadd_scale(double *v, double *v1, double *v2, double scale);
 
 // Simulation parameters
 void ReadInput(std::string inputFileName, InputData *SimulationParam);
-void UpdateEField(InputData *SimulationParam, int step);
+void UpdateEFieldOsc(InputData *SimulationParam, int step);
+void UpdateEFieldPulse(InputData *SimulationParam, int step);
 
 // Differential distribution models
 double ParkElasticCollisionCosX(double eps, std::vector<double> a);

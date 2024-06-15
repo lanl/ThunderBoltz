@@ -45,6 +45,9 @@ class TBParameters(Parameters):
     E=-24640.0
     #: (float) E-field oscillation frequency (Hz), default is ``0``.
     ET=0.
+    #: (float) E-field offset and standard deviation for Gaussian-like pulse, default is ``[0.0, 0.0]``
+    #: (no pulse).
+    EP=[0., 0.]
     #: (list[int]) Magnetic field vector (Tesla),
     #: default is ``[0.0, 0.0, 0.0]``.
     B=[0.0, 0.0, 0.0]
