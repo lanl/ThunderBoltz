@@ -16,6 +16,9 @@ The Python API can be installed via `pip`.
 
    pip install thunderboltz
 
+The ``thunderboltz`` package ships with the C++ ThunderBoltz source and requires only a gcc compiler
+to run complete calculations.
+
 The code can also be downloaded from the repository.
 Use the following command to clone the code into a local repository.
 
