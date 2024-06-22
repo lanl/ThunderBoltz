@@ -58,7 +58,7 @@ class MPRunner(object):
             **run_options: Keywords arguments that modify the nature of the
                 way the program runs.
         """
-        raise NotImplementedError("MPRunner must implement set_(self, **run_options) function.")
+        raise NotImplementedError("MPRunner must implement run(self, **run_options) function.")
 
     def get_directory(self):
         """Return the directory in which the calculation is occurring.
