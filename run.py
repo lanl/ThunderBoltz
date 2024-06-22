@@ -1,4 +1,4 @@
-"""Setup and run the simulations found in the ThunderBoltz paper."""
+"""Setup and run the simulations found in the ThunderBoltz wrapper."""
 import inspect
 import os
 from os.path import join as pjoin
