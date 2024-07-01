@@ -1783,20 +1783,12 @@ class ThunderBoltz(MPRunner):
         e = copy.deepcopy(x) # store errors 
 
         for col in x:
-            # Linear model
-            lin = lambda v, a, b: a*v + b
             t = x.index * self.DT 
             popt, pcov = np.polyfit(t, x[col], 1, cov=True)
             # Overwrite with slopes and errors, rescaled
             x[col] = popt[0]
-            # Slope standard deviation is sqrt(Cov(a,a))
+            # Slope standard deviation is sqrt(Cov[0,0])
             e[col] = np.sqrt(pcov[0][0])
-
-            # plt.plot(t, lin(t, *popt), label="fit")
-            # m_ = x.columns
-            # plt.title(f"{i} {m_} {self.tb_params['B']} {self.tb_params['E']}")
-            # plt.legend()
-            # plt.show()
 
         # Return in same shape
         if is_series: return to_series(x), to_series(e)
