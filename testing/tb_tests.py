@@ -88,7 +88,7 @@ def test_ss_enough_steps():
     with very few steps"""
     calc = TB(NS=1201, NP=[10, 2], **He_settings())
     calc.run()
-    sst = calc.get_ss_params(fits=False)
+    sst = calc.get_ss_params(fit=False)
     assert len(sst) == 1
 
 def test_autostep():
