@@ -2,6 +2,30 @@
 
 
 
+## v0.4.0 (2024-07-10)
+
+### Chore
+
+* chore: forward difference takes default parameter ([`564cd2b`](https://github.com/lanl/ThunderBoltz/commit/564cd2b28ae8b5eeed0fc16133de9793d09d3a74))
+
+### Documentation
+
+* docs: remove reference to linear model
+
+From old curve fit code (didn&#39;t work because of small time step
+values). ([`2420449`](https://github.com/lanl/ThunderBoltz/commit/242044990634961f150c5cc84a66cd4458d50e61))
+
+### Feature
+
+* feat: Add user defined timeseries plotting. ([`862ec81`](https://github.com/lanl/ThunderBoltz/commit/862ec81e8c94b767225a83427c8fc0c15c3016c3))
+
+* feat: added plot_tree ([`bd9534d`](https://github.com/lanl/ThunderBoltz/commit/bd9534d239752b23523c773f8b136c1c12e33ab2))
+
+### Test
+
+* test: update test for fits -&gt; fit rename ([`7bc391c`](https://github.com/lanl/ThunderBoltz/commit/7bc391c9c08382a2f2c41bf1669f1697093ba2cb))
+
+
 ## v0.3.0 (2024-06-22)
 
 ### Documentation
