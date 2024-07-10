@@ -1088,7 +1088,7 @@ class ThunderBoltz(MPRunner):
                 times in the simulation after one microsecond for steady state
                 calculations, or ``ss_func=lambda df: df.iloc[50:,:]`` would select
                 the last 50 time steps.
-            fits (bool): Option to use a line of best fit over the steady state
+            fit (bool): Option to use a line of best fit over the steady state
                 window to calculate time dependent parameters (bulk swarm parameters
                 and rate coefficients).
                 rather than averaging derivatives with the forward difference formula.
@@ -1133,7 +1133,7 @@ class ThunderBoltz(MPRunner):
         # Set time step after which stats are generated
         self.time_conv = ts_last.t.values[0]
 
-        if fits:
+        if fit:
             # Recalculate using fit method for time derivative calculations
             self._calculate_rates(ts_last, ddt=self.compute_fit, std=True)
             self._calculate_diffusion(ts_last, ddt=self.compute_fit, std=True)
@@ -1938,6 +1938,45 @@ def query_tree(directory, name_req=None, param_req=None,
 
     # Return the correct datatype
     return rtype
+
+def plot_tree(path, name_req=None, param_req=None, series=["MEe", "mobN", "a_N"],
+              save=None, stamp=["directory"]):
+    """Query a tree of calculations and make a simple time series plot for each
+    one.
+
+    Args:
+        path (str): The root of the tree to plot calculations from.
+        name_req (callable[str,bool]): A requirement on the file path
+            names to be included in the query. The callable accepts
+            the file path of a thunderboltz simulation directory and
+            should return ``True`` if that directory is to be included
+            in the query.
+
+            e.g. ``name_req=lambda s: "test_type_1" in s``
+            would return only data in a subfolder ``test_type_1``.
+
+        param_req (dict): A requirement on the
+            parameter settings of the ThunderBoltz calculations.
+            The dictionary corresponding to simulation parameters
+            that must be set by the read ThunderBoltz object.
+
+            e.g. ``param_req={"Ered": 100, "L": 1e-6}`` would only
+            return data from calculations with a reduced field of
+            100 Td and a cell length of 1 :math:`\mu{\rm m}`.
+
+        series (list[str]):
+            The y-parameters to plot onto the time series figure.
+
+        save (str): Option to save the plot to a file path.
+
+        stamp (list[str]): Option to stamp the figure with the value of
+            descriptive parameters, e.g. the field, or initial
+            number of particles. See :class:`~.thunderboltz.parameters.TBParameters`
+            and :class:`~.thunderboltz.parameters.WrapParameters`.
+    """
+    calcs = tb.query_tree(path, name_req=name_req, param_req=param_req)
+    for calc in calcs: calc.plot_timeseries(
+        series=series, stamp=stamp, save=save)
 
 def to_primitive(d):
     """Recursively convert collections with non primitive types

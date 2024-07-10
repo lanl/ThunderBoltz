@@ -9,6 +9,7 @@ src_path = os.path.join(os.path.dirname(__file__), "cpp")
 from .tb import ThunderBoltz
 from .tb import read
 from .tb import query_tree
+from .tb import plot_tree
 from .input import CrossSections
 from .kinetic import Process
 
