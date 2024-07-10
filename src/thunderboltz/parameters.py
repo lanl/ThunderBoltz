@@ -292,3 +292,13 @@ tb_parameters = TBParameters().get_params()
 wrap_parameters = WrapParameters().get_params()
 output_parameters = OutputParameters().get_params()
 particle_parameters = ParticleParameters().get_params()
+
+
+
+latex = {
+    # Diffusion fit expression
+    "D_fit_X": r"$\frac{1}{2} \langle (r_x - \langle r_x \rangle)^2 \rangle$",
+    "D_fit_Y": r"$\frac{1}{2} \langle (r_y - \langle r_y\rangle)^2 \rangle$",
+    "D_fit_Z": r"$\frac{1}{2} \langle (r_z - \langle r_z\rangle)^2 \rangle$",
+    "D_fit_H": r"$\frac{1}{2} \langle r_x r_z \rangle - \langle r_x \rangle \langle r_z \rangle$"
+}

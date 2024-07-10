@@ -1324,14 +1324,19 @@ class ThunderBoltz(MPRunner):
         :meth:`~thunderboltz.ThunderBoltz.plot_timeseries`"""
         self.ts_plot_params = params
 
-    def plot_timeseries(self, series=None, save=None, stamp=[], v=0,
-            update=True):
+    def plot_timeseries(self, series=None, save=None, stamp=[], v=0, update=True):
         """Create a diagnostic plot of ThunderBoltz time series
         data.
 
         Args:
-            series (list[str]):
-                The y-parameters to plot onto the time series figure.
+            series (list[str|tuple]):
+                The y-parameters to plot onto the time series figure. If the
+                element is a string, the corresponding parameter will be plotted
+                if available in :class:`~.thunderboltz.parameters.OutputParameters`.
+                If the element is a tuple, the first argument will be interpreted as the
+                name of a new user defined parameter, and the second argument a user defined
+                function that calculates it. The function must accept timeseries data
+                and return a single series to be plotted.
             save (str): Option to save the plot to a file path.
             stamp (list[str]): Option to stamp the figure with the value of
                 descriptive parameters, e.g. the field, or initial
@@ -1354,22 +1359,24 @@ class ThunderBoltz(MPRunner):
         if not len(self.timeseries):
             return # No data
 
-        if self.timeseries is None:
-            raise RuntimeError("Timeseries data not read.")
-        ts = self.timeseries.copy() # Alias
-
-        # Convert mobility values
-        ts["mobN"] = 1e-24*ts.mobN
-        if "mobN_bulk" in ts:
-            ts["mobN_bulk"] = 1e-24*ts.mobN_bulk
-        if "mobN_bulk_fit" in ts:
-            ts["mobN_bulk_fit"] = 1e-24*ts.mobN_bulk_fit
-
         # Create figure and ax objects, if necessary
         if not self.ts_fig:
             self.ts_fig, _ = plt.subplots(figsize=(14,9))
         fig = self.ts_fig # Alias
 
+        if self.timeseries is None:
+            raise RuntimeError("Timeseries data not read.")
+
+        def format_ts(ts):
+            # Convert mobility values
+            ts["mobN"] = 1e-24*ts.mobN
+            if "mobN_bulk" in ts:
+                ts["mobN_bulk"] = 1e-24*ts.mobN_bulk
+            if "mobN_bulk_fit" in ts:
+                ts["mobN_bulk_fit"] = 1e-24*ts.mobN_bulk_fit
+            return ts
+
+        ts = format_ts(self.timeseries.copy())
         # Plot timeseries with this figure
         plot_timeseries(fig, ts, series=self.ts_plot_params, save=save)
         # super title
