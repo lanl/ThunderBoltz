@@ -968,7 +968,7 @@ class ThunderBoltz(MPRunner):
         c = c.iloc[:npoints].copy()
 
         # Default time derivative is forward difference estimator
-        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
+        if ddt is None: ddt = lambda x, name=None: (x.diff()/self.DT, 0*x)
 
         # Compute collision rate data
         dcdt, c_std = ddt(c)
@@ -1009,10 +1009,10 @@ class ThunderBoltz(MPRunner):
 
         if ts is None: ts = self.timeseries
         # Default time derivative is forward difference estimator
-        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
+        if ddt is None: ddt = lambda x, name=None: (x.diff()/self.DT, 0*x)
 
         # Calculate bulk parameters
-        zdrift, zdrift_std = ddt(ts.Rzi)
+        zdrift, zdrift_std = ddt(ts.Rzi, r"$\langle r_z \rangle$")
         ts["Wz"] = np.abs(zdrift)
         ts["mobN_bulk"] = zdrift/ts.E.abs()*ts.n_gas
         ts["a_n_bulk"] = ts.k_i / zdrift
@@ -1048,12 +1048,13 @@ class ThunderBoltz(MPRunner):
         if ts is None: ts = self.timeseries
 
         # Default to forward difference time derivative operator
-        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
+        if ddt is None: ddt = lambda x, name=None: (x.diff()/self.DT, 0*x)
 
         for axis in ["X", "Y", "Z"]:
             # Compute on-axis bulk diffusion coefficients
             R = ts[f"R{axis.lower()}i"]
-            dii, dii_std = ddt(1/2 * (ts[2*axis] - R**2))
+            dii, dii_std = ddt(1/2 * (ts[2*axis] - R**2),
+                parameters.latex[f"D_fit_{axis}"])
             ts[f"D_{axis}{axis}_bulk"] = dii
             # Compute on-axis flux diffusion coefficients
             V = ts[f"V{axis.lower()}i"]
@@ -1065,14 +1066,14 @@ class ThunderBoltz(MPRunner):
 
         # Compute hall diffusion
         # fig, ax = plt.subplots()
-        dh, dh_std = ddt(ts["XZ"] - ts["Rxi"]*ts["Rzi"])
+        dh, dh_std = ddt(ts["XZ"] - ts["Rxi"]*ts["Rzi"], parameters.latex["D_fit_H"])
         ts["D_H_bulk"] = dh
         ts["D_H"] = ts["XVZ"] + ts["ZVX"] - ts["Rxi"]*ts["Vzi"] - ts["Rzi"]*ts["Vxi"]
 
         if std:
             ts["D_H_bulk_std"] = dh_std
 
-    def get_ss_params(self, ss_func=None, fits=False):
+    def get_ss_params(self, ss_func=None, fit=False):
         """Get steady-state transport parameter values by averaging last section
         of time series. By default, the last fourth of the available data is
         considered to be steady-state. Standard deviations over this interval
@@ -1772,7 +1773,7 @@ class ThunderBoltz(MPRunner):
                 self.runtime_start = dat["runtime_start"]
                 self.runtime_end = dat["runtime_end"]
 
-    def compute_fit(self, x_):
+    def compute_fit(self, x_, name=None):
         """Get the slope and associated error of the line of best fit. If
         x is a Dataframe, do so for each column."""
         is_series = isinstance(x_, pd.Series)
