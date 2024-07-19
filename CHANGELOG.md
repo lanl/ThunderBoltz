@@ -2,6 +2,19 @@
 
 
 
+## v0.4.1 (2024-07-19)
+
+### Fix
+
+* fix: use c++ rng instead of c built-in ([`668ee6f`](https://github.com/lanl/ThunderBoltz/commit/668ee6f452a2885e7a523d1524e64347ffa1974b))
+
+* fix: Nmin criteria is now taken as max
+
+Instead of using N_A N_B product criteria to determine NP,
+it will only do so if more particles are required compared to the NP
+set by the user. ([`8056016`](https://github.com/lanl/ThunderBoltz/commit/8056016ee868cdbfaa38c4fe094e0d7e6530f13f))
+
+
 ## v0.4.0 (2024-07-10)
 
 ### Chore
