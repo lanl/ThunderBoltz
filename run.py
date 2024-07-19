@@ -104,7 +104,7 @@ def onsager_relation():
     calc.run(std_banner=False, live=False, live_rate=False)
 
     # Plot results once finished
-    visualize.plot_onsager()
+    # visualize.plot_onsager()
 
 def reid_ramp():
     """Benchmark test for an inelastic cross section."""

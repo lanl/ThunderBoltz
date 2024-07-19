@@ -342,7 +342,10 @@ class ThunderBoltz(MPRunner):
         self.cs.table.loc[msk, ["model_name", "params"]] = (name, params)
 
     def _impose_nprod_crit(self):
-        """Minimum requirement for the product of each species particle count."""
+        """Minimum requirement for the product of each species particle count.
+        Currently assumes first two species are the electrons and background
+        gas respectively."""
+
         # Aliases
         tb = self.tb_params
         hp = self.hp
@@ -352,7 +355,7 @@ class ThunderBoltz(MPRunner):
         if "EP_0" not in hp:
             hp["EP_0"] = 10.
         if "Nmin" not in hp: # Npairs multiplier (>=1)
-            hp["CSTR_P"] = 1.0
+            hp["Nmin"] = 1.0
         # Reduced mass (kg)
         m1, m2 = tb["MP"][0], tb["MP"][1]
         mu = m1*m2/(m1+m2) * AMU_TO_KG # amu to kg
@@ -377,9 +380,12 @@ class ThunderBoltz(MPRunner):
         # Condition: only accelerate EP_0 electrons a max of DE each step
         Ne = hp["Nmin"]*np.sqrt(2*QE*hp["EP_0"]/ME)*2*QE*EoN/(QE*hp["DE"]*vsig_min_max)
 
+        # Take maximum of current number of particles with this condition
+        Ne = max(Ne, tb["NP"][0]*tb["NP"][1])
+
         if "pct_ion" in hp:
-            tb["NP"][1] = int(np.sqrt(Ne/hp["pct_ion"]))
-            tb["NP"][0] = int(hp["pct_ion"]*np.sqrt(Ne/hp["pct_ion"]))
+            tb["NP"][1] = np.ceil(np.sqrt(Ne/hp["pct_ion"]))
+            tb["NP"][0] = np.ceil(hp["pct_ion"]*np.sqrt(Ne/hp["pct_ion"]))
 
         # Compute E with NP and L
         n_gas = tb["NP"][hp["gas_index"]]/tb["L"]**3
@@ -415,6 +421,7 @@ class ThunderBoltz(MPRunner):
                 raise RuntimeError("Specify percent ionization (pct_ion) for autostep")
             # Calculate Nprod constraint and time step
             self._impose_nprod_crit()
+
         elif hp["pct_ion"] and hp["NN"]:
             # Calculate # of particles
             tb["NP"] = [int(hp["NN"]*hp["pct_ion"]), hp["NN"]]
@@ -1386,7 +1393,10 @@ class ThunderBoltz(MPRunner):
             stamps["directory"] = Path(self.directory).parts[-1]
         stamps = {k: v for k, v in stamps.items() if k in stamp}
         # Use pandas Series to create a pretty string.
-        stt = "\n".join(str(pd.Series(stamps, dtype="object")).split("\n")[:-1])
+        stamp_fmt = pd.DataFrame([pd.Series(stamps, dtype="object")]).T
+        # stamp_fmt.loc[:,0]
+        sss = stamp_fmt.to_string(float_format=lambda s: f"{s:.3e}" if s=="DT" else str(s))
+        stt = "\n".join(str(sss).split("\n")[1:])
         fig.suptitle(stt, fontsize=10, fontproperties={"family": "monospace"})
 
         if save:
@@ -1406,8 +1416,6 @@ class ThunderBoltz(MPRunner):
         data.
 
         Args:
-            series (list[str]):
-                The y-parameters to plot onto the time series figure.
             save (str): Option to save the plot to a file path.
             stamp (list[str]): Option to stamp the figure with the value of
                 descriptive parameters, e.g. the field, or initial
@@ -1722,6 +1730,7 @@ class ThunderBoltz(MPRunner):
         # Log inputs into table format
         for p, v in self.tb_params.items():
             if isinstance(v, list):
+                df[p] = None # Init column to avoid type error
                 df.loc[:, p] = " ".join(str(t) for t in v)
             else:
                 df.loc[:, p] = v
@@ -1947,12 +1956,20 @@ def query_tree(directory, name_req=None, param_req=None,
     # Return the correct datatype
     return rtype
 
-def plot_tree(path, name_req=None, param_req=None, series=["MEe", "mobN", "a_N"],
+def plot_tree(path, series=["MEe", "mobN", "a_n"], name_req=None, param_req=None,
               save=None, stamp=["directory"]):
     """Query a tree of calculations and make a simple time series plot for each
     one.
 
     Args:
+        series (list[str]):
+            The y-parameters to plot onto the time series figure. If the
+            element is a string, the corresponding parameter will be plotted
+            if available in :class:`~.thunderboltz.parameters.OutputParameters`.
+            If the element is a tuple, the first argument will be interpreted as the
+            name of a new user defined parameter, and the second argument a user defined
+            function that calculates it. The function must accept timeseries data
+            and return a single series to be plotted.
         path (str): The root of the tree to plot calculations from.
         name_req (callable[str,bool]): A requirement on the file path
             names to be included in the query. The callable accepts
@@ -1971,9 +1988,6 @@ def plot_tree(path, name_req=None, param_req=None, series=["MEe", "mobN", "a_N"]
             e.g. ``param_req={"Ered": 100, "L": 1e-6}`` would only
             return data from calculations with a reduced field of
             100 Td and a cell length of 1 :math:`\mu{\rm m}`.
-
-        series (list[str]):
-            The y-parameters to plot onto the time series figure.
 
         save (str): Option to save the plot to a file path.
 
