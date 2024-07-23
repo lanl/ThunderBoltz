@@ -2,6 +2,80 @@
 
 
 
+## v0.4.1 (2024-07-19)
+
+### Fix
+
+* fix: use c++ rng instead of c built-in ([`668ee6f`](https://github.com/lanl/ThunderBoltz/commit/668ee6f452a2885e7a523d1524e64347ffa1974b))
+
+* fix: Nmin criteria is now taken as max
+
+Instead of using N_A N_B product criteria to determine NP,
+it will only do so if more particles are required compared to the NP
+set by the user. ([`8056016`](https://github.com/lanl/ThunderBoltz/commit/8056016ee868cdbfaa38c4fe094e0d7e6530f13f))
+
+
+## v0.4.0 (2024-07-10)
+
+### Chore
+
+* chore: forward difference takes default parameter ([`564cd2b`](https://github.com/lanl/ThunderBoltz/commit/564cd2b28ae8b5eeed0fc16133de9793d09d3a74))
+
+### Documentation
+
+* docs: remove reference to linear model
+
+From old curve fit code (didn&#39;t work because of small time step
+values). ([`2420449`](https://github.com/lanl/ThunderBoltz/commit/242044990634961f150c5cc84a66cd4458d50e61))
+
+### Feature
+
+* feat: Add user defined timeseries plotting. ([`862ec81`](https://github.com/lanl/ThunderBoltz/commit/862ec81e8c94b767225a83427c8fc0c15c3016c3))
+
+* feat: added plot_tree ([`bd9534d`](https://github.com/lanl/ThunderBoltz/commit/bd9534d239752b23523c773f8b136c1c12e33ab2))
+
+### Test
+
+* test: update test for fits -&gt; fit rename ([`7bc391c`](https://github.com/lanl/ThunderBoltz/commit/7bc391c9c08382a2f2c41bf1669f1697093ba2cb))
+
+
+## v0.3.0 (2024-06-22)
+
+### Documentation
+
+* docs: update readme + spelling ([`656eeb4`](https://github.com/lanl/ThunderBoltz/commit/656eeb464e75ba81df805974fff91be152a3a8a0))
+
+* docs: spelling ([`94fbb13`](https://github.com/lanl/ThunderBoltz/commit/94fbb130037977ad4d917406ecf042b8294205ed))
+
+* docs: update onsager analytic rate expression ([`4fa850f`](https://github.com/lanl/ThunderBoltz/commit/4fa850f8b3c2b1d69847ff428cb7f7c1ef24c07f))
+
+* docs: add diffusion documentation ([`9ff3b33`](https://github.com/lanl/ThunderBoltz/commit/9ff3b33fcb2626215ac7adde483671e61fd5e4d4))
+
+### Feature
+
+* feat: allow cross section plotter to accept labels ([`1e48e80`](https://github.com/lanl/ThunderBoltz/commit/1e48e803d64146d14c2f4af96130f3ae5eb71f6e))
+
+* feat: add optional fit for all time derivatives ([`644afc2`](https://github.com/lanl/ThunderBoltz/commit/644afc2a5ba63016266be280ddf6fca950fd8d59))
+
+* feat: add Reid ramp setup through python API ([`76b4714`](https://github.com/lanl/ThunderBoltz/commit/76b4714c786fb63c74c9fc83bf730feb1bc2a07b))
+
+* feat: add diffusion correlation calcs to c++ src ([`0049912`](https://github.com/lanl/ThunderBoltz/commit/00499122be5e670f0fdc8184ee007acaac1070ef))
+
+### Fix
+
+* fix: Remove SST experiments from transport figure ([`a7573b6`](https://github.com/lanl/ThunderBoltz/commit/a7573b641df08c86dc4a8e2c7db56bd7ae3043c0))
+
+* fix: fillna preventing ionization calculation ([`4e968ff`](https://github.com/lanl/ThunderBoltz/commit/4e968ff4de0f3031070126bd09bf89f206d01dd9))
+
+* fix: change onsager cross sections and fig ([`924fce9`](https://github.com/lanl/ThunderBoltz/commit/924fce92bb1bc4e6b6ec33598d644f3ac0241832))
+
+* fix: change CR default to 0 (match w/ cpp default) ([`efec58f`](https://github.com/lanl/ThunderBoltz/commit/efec58f5777f042da1fa019607901e1c9106f92a))
+
+### Test
+
+* test: add ExB direction check ([`be8843e`](https://github.com/lanl/ThunderBoltz/commit/be8843ed3121e1b928769c2b146b5866176a4d04))
+
+
 ## v0.2.0 (2024-01-07)
 
 ### Documentation

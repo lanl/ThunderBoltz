@@ -342,7 +342,10 @@ class ThunderBoltz(MPRunner):
         self.cs.table.loc[msk, ["model_name", "params"]] = (name, params)
 
     def _impose_nprod_crit(self):
-        """Minimum requirement for the product of each species particle count."""
+        """Minimum requirement for the product of each species particle count.
+        Currently assumes first two species are the electrons and background
+        gas respectively."""
+
         # Aliases
         tb = self.tb_params
         hp = self.hp
@@ -352,7 +355,7 @@ class ThunderBoltz(MPRunner):
         if "EP_0" not in hp:
             hp["EP_0"] = 10.
         if "Nmin" not in hp: # Npairs multiplier (>=1)
-            hp["CSTR_P"] = 1.0
+            hp["Nmin"] = 1.0
         # Reduced mass (kg)
         m1, m2 = tb["MP"][0], tb["MP"][1]
         mu = m1*m2/(m1+m2) * AMU_TO_KG # amu to kg
@@ -377,9 +380,12 @@ class ThunderBoltz(MPRunner):
         # Condition: only accelerate EP_0 electrons a max of DE each step
         Ne = hp["Nmin"]*np.sqrt(2*QE*hp["EP_0"]/ME)*2*QE*EoN/(QE*hp["DE"]*vsig_min_max)
 
+        # Take maximum of current number of particles with this condition
+        Ne = max(Ne, tb["NP"][0]*tb["NP"][1])
+
         if "pct_ion" in hp:
-            tb["NP"][1] = int(np.sqrt(Ne/hp["pct_ion"]))
-            tb["NP"][0] = int(hp["pct_ion"]*np.sqrt(Ne/hp["pct_ion"]))
+            tb["NP"][1] = np.ceil(np.sqrt(Ne/hp["pct_ion"]))
+            tb["NP"][0] = np.ceil(hp["pct_ion"]*np.sqrt(Ne/hp["pct_ion"]))
 
         # Compute E with NP and L
         n_gas = tb["NP"][hp["gas_index"]]/tb["L"]**3
@@ -415,6 +421,7 @@ class ThunderBoltz(MPRunner):
                 raise RuntimeError("Specify percent ionization (pct_ion) for autostep")
             # Calculate Nprod constraint and time step
             self._impose_nprod_crit()
+
         elif hp["pct_ion"] and hp["NN"]:
             # Calculate # of particles
             tb["NP"] = [int(hp["NN"]*hp["pct_ion"]), hp["NN"]]
@@ -968,7 +975,7 @@ class ThunderBoltz(MPRunner):
         c = c.iloc[:npoints].copy()
 
         # Default time derivative is forward difference estimator
-        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
+        if ddt is None: ddt = lambda x, name=None: (x.diff()/self.DT, 0*x)
 
         # Compute collision rate data
         dcdt, c_std = ddt(c)
@@ -1009,10 +1016,10 @@ class ThunderBoltz(MPRunner):
 
         if ts is None: ts = self.timeseries
         # Default time derivative is forward difference estimator
-        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
+        if ddt is None: ddt = lambda x, name=None: (x.diff()/self.DT, 0*x)
 
         # Calculate bulk parameters
-        zdrift, zdrift_std = ddt(ts.Rzi)
+        zdrift, zdrift_std = ddt(ts.Rzi, r"$\langle r_z \rangle$")
         ts["Wz"] = np.abs(zdrift)
         ts["mobN_bulk"] = zdrift/ts.E.abs()*ts.n_gas
         ts["a_n_bulk"] = ts.k_i / zdrift
@@ -1048,12 +1055,13 @@ class ThunderBoltz(MPRunner):
         if ts is None: ts = self.timeseries
 
         # Default to forward difference time derivative operator
-        if ddt is None: ddt = lambda x: (x.diff()/self.DT, 0*x)
+        if ddt is None: ddt = lambda x, name=None: (x.diff()/self.DT, 0*x)
 
         for axis in ["X", "Y", "Z"]:
             # Compute on-axis bulk diffusion coefficients
             R = ts[f"R{axis.lower()}i"]
-            dii, dii_std = ddt(1/2 * (ts[2*axis] - R**2))
+            dii, dii_std = ddt(1/2 * (ts[2*axis] - R**2),
+                parameters.latex[f"D_fit_{axis}"])
             ts[f"D_{axis}{axis}_bulk"] = dii
             # Compute on-axis flux diffusion coefficients
             V = ts[f"V{axis.lower()}i"]
@@ -1065,14 +1073,14 @@ class ThunderBoltz(MPRunner):
 
         # Compute hall diffusion
         # fig, ax = plt.subplots()
-        dh, dh_std = ddt(ts["XZ"] - ts["Rxi"]*ts["Rzi"])
+        dh, dh_std = ddt(ts["XZ"] - ts["Rxi"]*ts["Rzi"], parameters.latex["D_fit_H"])
         ts["D_H_bulk"] = dh
         ts["D_H"] = ts["XVZ"] + ts["ZVX"] - ts["Rxi"]*ts["Vzi"] - ts["Rzi"]*ts["Vxi"]
 
         if std:
             ts["D_H_bulk_std"] = dh_std
 
-    def get_ss_params(self, ss_func=None, fits=False):
+    def get_ss_params(self, ss_func=None, fit=False):
         """Get steady-state transport parameter values by averaging last section
         of time series. By default, the last fourth of the available data is
         considered to be steady-state. Standard deviations over this interval
@@ -1088,7 +1096,7 @@ class ThunderBoltz(MPRunner):
                 times in the simulation after one microsecond for steady state
                 calculations, or ``ss_func=lambda df: df.iloc[50:,:]`` would select
                 the last 50 time steps.
-            fits (bool): Option to use a line of best fit over the steady state
+            fit (bool): Option to use a line of best fit over the steady state
                 window to calculate time dependent parameters (bulk swarm parameters
                 and rate coefficients).
                 rather than averaging derivatives with the forward difference formula.
@@ -1133,7 +1141,7 @@ class ThunderBoltz(MPRunner):
         # Set time step after which stats are generated
         self.time_conv = ts_last.t.values[0]
 
-        if fits:
+        if fit:
             # Recalculate using fit method for time derivative calculations
             self._calculate_rates(ts_last, ddt=self.compute_fit, std=True)
             self._calculate_diffusion(ts_last, ddt=self.compute_fit, std=True)
@@ -1323,14 +1331,19 @@ class ThunderBoltz(MPRunner):
         :meth:`~thunderboltz.ThunderBoltz.plot_timeseries`"""
         self.ts_plot_params = params
 
-    def plot_timeseries(self, series=None, save=None, stamp=[], v=0,
-            update=True):
+    def plot_timeseries(self, series=None, save=None, stamp=[], v=0, update=True):
         """Create a diagnostic plot of ThunderBoltz time series
         data.
 
         Args:
-            series (list[str]):
-                The y-parameters to plot onto the time series figure.
+            series (list[str|tuple]):
+                The y-parameters to plot onto the time series figure. If the
+                element is a string, the corresponding parameter will be plotted
+                if available in :class:`~.thunderboltz.parameters.OutputParameters`.
+                If the element is a tuple, the first argument will be interpreted as the
+                name of a new user defined parameter, and the second argument a user defined
+                function that calculates it. The function must accept timeseries data
+                and return a single series to be plotted.
             save (str): Option to save the plot to a file path.
             stamp (list[str]): Option to stamp the figure with the value of
                 descriptive parameters, e.g. the field, or initial
@@ -1353,22 +1366,24 @@ class ThunderBoltz(MPRunner):
         if not len(self.timeseries):
             return # No data
 
-        if self.timeseries is None:
-            raise RuntimeError("Timeseries data not read.")
-        ts = self.timeseries.copy() # Alias
-
-        # Convert mobility values
-        ts["mobN"] = 1e-24*ts.mobN
-        if "mobN_bulk" in ts:
-            ts["mobN_bulk"] = 1e-24*ts.mobN_bulk
-        if "mobN_bulk_fit" in ts:
-            ts["mobN_bulk_fit"] = 1e-24*ts.mobN_bulk_fit
-
         # Create figure and ax objects, if necessary
         if not self.ts_fig:
             self.ts_fig, _ = plt.subplots(figsize=(14,9))
         fig = self.ts_fig # Alias
 
+        if self.timeseries is None:
+            raise RuntimeError("Timeseries data not read.")
+
+        def format_ts(ts):
+            # Convert mobility values
+            ts["mobN"] = 1e-24*ts.mobN
+            if "mobN_bulk" in ts:
+                ts["mobN_bulk"] = 1e-24*ts.mobN_bulk
+            if "mobN_bulk_fit" in ts:
+                ts["mobN_bulk_fit"] = 1e-24*ts.mobN_bulk_fit
+            return ts
+
+        ts = format_ts(self.timeseries.copy())
         # Plot timeseries with this figure
         plot_timeseries(fig, ts, series=self.ts_plot_params, save=save)
         # super title
@@ -1378,7 +1393,10 @@ class ThunderBoltz(MPRunner):
             stamps["directory"] = Path(self.directory).parts[-1]
         stamps = {k: v for k, v in stamps.items() if k in stamp}
         # Use pandas Series to create a pretty string.
-        stt = "\n".join(str(pd.Series(stamps, dtype="object")).split("\n")[:-1])
+        stamp_fmt = pd.DataFrame([pd.Series(stamps, dtype="object")]).T
+        # stamp_fmt.loc[:,0]
+        sss = stamp_fmt.to_string(float_format=lambda s: f"{s:.3e}" if s=="DT" else str(s))
+        stt = "\n".join(str(sss).split("\n")[1:])
         fig.suptitle(stt, fontsize=10, fontproperties={"family": "monospace"})
 
         if save:
@@ -1398,8 +1416,6 @@ class ThunderBoltz(MPRunner):
         data.
 
         Args:
-            series (list[str]):
-                The y-parameters to plot onto the time series figure.
             save (str): Option to save the plot to a file path.
             stamp (list[str]): Option to stamp the figure with the value of
                 descriptive parameters, e.g. the field, or initial
@@ -1715,6 +1731,7 @@ class ThunderBoltz(MPRunner):
         for p, v in self.tb_params.items():
             if p in df: continue # Don't overwrite data with clashing keys
             if isinstance(v, list):
+                df[p] = None # Init column to avoid type error
                 df.loc[:, p] = " ".join(str(t) for t in v)
             else:
                 df.loc[:, p] = v
@@ -1774,7 +1791,7 @@ class ThunderBoltz(MPRunner):
                 self.runtime_start = dat["runtime_start"]
                 self.runtime_end = dat["runtime_end"]
 
-    def compute_fit(self, x_):
+    def compute_fit(self, x_, name=None):
         """Get the slope and associated error of the line of best fit. If
         x is a Dataframe, do so for each column."""
         is_series = isinstance(x_, pd.Series)
@@ -1785,20 +1802,12 @@ class ThunderBoltz(MPRunner):
         e = copy.deepcopy(x) # store errors 
 
         for col in x:
-            # Linear model
-            lin = lambda v, a, b: a*v + b
             t = x.index * self.DT 
             popt, pcov = np.polyfit(t, x[col], 1, cov=True)
             # Overwrite with slopes and errors, rescaled
             x[col] = popt[0]
-            # Slope standard deviation is sqrt(Cov(a,a))
+            # Slope standard deviation is sqrt(Cov[0,0])
             e[col] = np.sqrt(pcov[0][0])
-
-            # plt.plot(t, lin(t, *popt), label="fit")
-            # m_ = x.columns
-            # plt.title(f"{i} {m_} {self.tb_params['B']} {self.tb_params['E']}")
-            # plt.legend()
-            # plt.show()
 
         # Return in same shape
         if is_series: return to_series(x), to_series(e)
@@ -1948,6 +1957,50 @@ def query_tree(directory, name_req=None, param_req=None,
 
     # Return the correct datatype
     return rtype
+
+def plot_tree(path, series=["MEe", "mobN", "a_n"], name_req=None, param_req=None,
+              save=None, stamp=["directory"]):
+    """Query a tree of calculations and make a simple time series plot for each
+    one.
+
+    Args:
+        series (list[str]):
+            The y-parameters to plot onto the time series figure. If the
+            element is a string, the corresponding parameter will be plotted
+            if available in :class:`~.thunderboltz.parameters.OutputParameters`.
+            If the element is a tuple, the first argument will be interpreted as the
+            name of a new user defined parameter, and the second argument a user defined
+            function that calculates it. The function must accept timeseries data
+            and return a single series to be plotted.
+        path (str): The root of the tree to plot calculations from.
+        name_req (callable[str,bool]): A requirement on the file path
+            names to be included in the query. The callable accepts
+            the file path of a thunderboltz simulation directory and
+            should return ``True`` if that directory is to be included
+            in the query.
+
+            e.g. ``name_req=lambda s: "test_type_1" in s``
+            would return only data in a subfolder ``test_type_1``.
+
+        param_req (dict): A requirement on the
+            parameter settings of the ThunderBoltz calculations.
+            The dictionary corresponding to simulation parameters
+            that must be set by the read ThunderBoltz object.
+
+            e.g. ``param_req={"Ered": 100, "L": 1e-6}`` would only
+            return data from calculations with a reduced field of
+            100 Td and a cell length of 1 :math:`\mu{\rm m}`.
+
+        save (str): Option to save the plot to a file path.
+
+        stamp (list[str]): Option to stamp the figure with the value of
+            descriptive parameters, e.g. the field, or initial
+            number of particles. See :class:`~.thunderboltz.parameters.TBParameters`
+            and :class:`~.thunderboltz.parameters.WrapParameters`.
+    """
+    calcs = tb.query_tree(path, name_req=name_req, param_req=param_req)
+    for calc in calcs: calc.plot_timeseries(
+        series=series, stamp=stamp, save=save)
 
 def to_primitive(d):
     """Recursively convert collections with non primitive types

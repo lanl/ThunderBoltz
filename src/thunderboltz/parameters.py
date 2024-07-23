@@ -253,11 +253,11 @@ class OutputParameters(Parameters):
     #: are combined into the flux Hall diffusion :math:`D^f_{\text{H}} = D^f_{xz} + D^f_{zx}`.
     D_H=0.
     #: (float) The diagonal components of the bulk diffusion tensor
-    #: :math:`\overleftrightarrow{\boldsymbol{D}}^b = \frac{1}{2} \frac{\text{d}}{\text{d}t}\langle (\boldsymbol{r} - \langle \boldsymbol{r})^2 \rangle`
+    #: :math:`\overleftrightarrow{\boldsymbol{D}}^b = \frac{1}{2} \frac{\text{d}}{\text{d}t}\langle (\boldsymbol{r} - \langle \boldsymbol{r}\rangle)^2 \rangle`
     #: are output under ``D_XX_bulk``, ``D_YY_bulk``, and ``D_ZZ_bulk``.
     D_XX_bulk=0.
     #: (float) The hall components of the bulk diffusion tensor
-    #: :math:`\overleftrightarrow{\boldsymbol{D}}^b = \frac{1}{2} \frac{\text{d}}{\text{d}t}\langle (\boldsymbol{r} - \langle \boldsymbol{r})^2 \rangle`
+    #: :math:`\overleftrightarrow{\boldsymbol{D}}^b = \frac{1}{2} \frac{\text{d}}{\text{d}t}\langle (\boldsymbol{r} - \langle \boldsymbol{r}\rangle)^2 \rangle`
     #: are combined into the bulk Hall diffusion :math:`D^b_{\text{H}} = D^b_{xz} + D^b_{zx}`.
     D_H_bulk=0.
 
@@ -295,3 +295,13 @@ tb_parameters = TBParameters().get_params()
 wrap_parameters = WrapParameters().get_params()
 output_parameters = OutputParameters().get_params()
 particle_parameters = ParticleParameters().get_params()
+
+
+
+latex = {
+    # Diffusion fit expression
+    "D_fit_X": r"$\frac{1}{2} \langle (r_x - \langle r_x \rangle)^2 \rangle$",
+    "D_fit_Y": r"$\frac{1}{2} \langle (r_y - \langle r_y\rangle)^2 \rangle$",
+    "D_fit_Z": r"$\frac{1}{2} \langle (r_z - \langle r_z\rangle)^2 \rangle$",
+    "D_fit_H": r"$\frac{1}{2} \langle r_x r_z \rangle - \langle r_x \rangle \langle r_z \rangle$"
+}

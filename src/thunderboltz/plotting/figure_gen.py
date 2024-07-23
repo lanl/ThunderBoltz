@@ -27,34 +27,39 @@ def plot_timeseries(fig, ts, series=["MEe", "mobN", "a_n"], save=None):
     if len(fig.axes) > 1:
         # Reset the twin axes
         [a.remove() for a in fig.axes[1:]]
+
+    # Map strings to callables
+    names = [s[0] if isinstance(s, tuple) else s for s in series]
+    user_styles = [s[2] if isinstance(s, tuple) and len(s)>2 else {}
+                   for s in series]
+    series = [s[1](ts) if isinstance(s, tuple) else ts[s] for s in series]
+
     # Create twin axes
     [fig.axes[0].twinx() for param in series[1:]]
     ax = fig.axes[0]
     ax.grid(which='major', color='gray', linestyle='-', alpha=0.5)
     ax.grid(which='minor', color='gray', linestyle='-', alpha=0.3)
     # Plot first dataset on left hand side
-    ax.plot(ts.t, ts[series[0]], label=styles.label_maps(series[0]), c="green")
+    ax.plot(ts.t, series[0], label=styles.label_maps(names[0]), c="green", **user_styles[0])
+
     # Get lims for before plotting verticle lines
     ylm = ax.get_ylim()
     ax.set_ylim(*ylm)
-    ax.set_ylabel(styles.label_maps(series[0]))
+    ax.set_ylabel(styles.label_maps(names[0]))
     ax.set_xlabel("Time (s)")
     colors = ["purple", "red", "orange", "pink", "green", "blue", "#afa", "#33b"]
     offset = 1.
-    for i, (s, c) in enumerate(zip(series[1:], colors)):
+    for i, (s, n, u, c) in enumerate(zip(series[1:], names[1:], user_styles[1:], colors)):
         axtwin = fig.axes[i+1]
         axtwin.spines.right.set_position(("axes", offset))
         offset += 0.18
-        axtwin.set_ylabel(styles.label_maps(s))
-        axtwin.plot(ts.t, ts[s], c=c, label=styles.label_maps(s))
+        axtwin.set_ylabel(styles.label_maps(n))
+        axtwin.plot(ts.t, s, c=c, label=styles.label_maps(n), **u)
+
     handles, labels = figure_legend(fig.axes)
     leg = fig.legend(handles, labels, loc="lower center", ncol=100)
     fig.subplots_adjust(right=max(.2, 2-.9*offset), bottom=.18, top=.80)
     return fig
-
-def plot_rates(ax, ts, bins=150):
-    """Plot the reaction rates on the."""
-    pass
 
 def plot_eedfs(ax, esamples, bins=150):
     """Plot the electron energy density funciton"""

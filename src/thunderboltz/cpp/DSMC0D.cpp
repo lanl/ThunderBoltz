@@ -79,12 +79,21 @@ int main(int argc, char *argv[])
 }
 
 /***** HELPER FUNCTIONS *********************************************************/
-/* random number generator for now using built-in but this is not adequate for real simulations*/
 double rnd()
 {
-    // TODO: rand() includes 0, so this can return 0, investigate if this is an issue
-    return rand()/(double)RAND_MAX;
+	static std::random_device rd;
+	static std::mt19937_64 generator(rd());
+	static std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
+	double rnd  = uniform_dist(generator);
+    return rnd;
 }
+
+/* random number generator for now using built-in but this is not adequate for real simulations*/
+// double rnd()
+// {
+//     // TODO: rand() includes 0, so this can return 0, investigate if this is an issue
+//     return rand()/(double)RAND_MAX;
+// }
 
 void ReportStatus(Particles *AllParticle, CrossSections *AllCrossSections, InputData *Parameters, int step)
 {
@@ -863,7 +872,7 @@ int Particles::RandOfType(int type, unsigned long *pid)
     // Return the 
     int rand, randpart;
 
-    rand = std::rand() % typeList[type].particleIdentifier.size();
+    rand = int(rnd() * typeList[type].particleIdentifier.size());
     randpart = typeList[type].particleIdentifier[rand]; /*??*/
     *pid = rand; // save the index in the type list
 
