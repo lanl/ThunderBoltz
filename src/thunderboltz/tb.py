@@ -431,7 +431,7 @@ class ThunderBoltz(MPRunner):
 
         # Calculate other derived parameters, if need be
         if hp["duration"]:
-            tb["NS"] = hp["duration"] // tb["DT"]
+            tb["NS"] = int(np.ceil((hp["duration"] // tb["DT"])))
 
         if hp["Ered"] is not None:
             # Calculate E-field in V/m such that an electron

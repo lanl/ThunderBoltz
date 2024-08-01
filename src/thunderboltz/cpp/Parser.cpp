@@ -46,8 +46,8 @@ void ReadInput(std::string inputFileName, InputData *SimulationParam)
         if(Index=="EP"){
             double offset, width;
             file >> offset >> width;
-            printf("reading electric field pulse offset: %e (t)", offset);
-            printf("reading electric field pulse standard deviation: %e (t)", width);
+            printf("reading electric field pulse offset: %e (t)\n", offset);
+            printf("reading electric field pulse standard deviation: %e (t)\n", width);
             SimulationParam->Epulse[0] = offset;
             SimulationParam->Epulse[1] = width;
         }

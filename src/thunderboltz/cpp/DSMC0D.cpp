@@ -81,8 +81,8 @@ int main(int argc, char *argv[])
 /***** HELPER FUNCTIONS *********************************************************/
 double rnd()
 {
-	static std::random_device rd;
-	static std::mt19937_64 generator(rd());
+	static std::random_device random;
+	static std::mt19937_64 generator(random());
 	static std::uniform_real_distribution<double> uniform_dist(0.0, 1.0);
 	double rnd  = uniform_dist(generator);
     return rnd;
@@ -607,7 +607,7 @@ void DSMCcollideNTC(Particles *particle_list, CrossSections *CrossSecList, Input
         // Update the new remainder if CR param is set
         if (SimulationParam->CR) rem = NP_rem - Npairs;
 
-        if(quiet==1) printf("Npairs %lu \n", Npairs);
+        if(quiet==1) printf("Npairs %lu float %e rem %e\n", Npairs, NP, NP_rem);
 
         for (unsigned long j=0; j<Npairs; j++) {
             //Select two random particles for the test collision pair
@@ -680,7 +680,7 @@ void DSMCcollideNTC(Particles *particle_list, CrossSections *CrossSecList, Input
                     SimulationParam->Nparticles[particleType1]=partType1IDs.size();
                     SimulationParam->Nparticles[product1Type]=prodType1IDs.size();
 
-                } else if (collisionType=="N2Dissociation") {
+                } else if (collisionType=="Dissociation") {
                     //Assume reaction is in order e + N2 -> e + N + N
 
                     //step 1: inelastic collision with electron
@@ -1102,8 +1102,7 @@ void UpdateEFieldPulse(InputData *SimulationParam, int step)
     double t = step*SimulationParam->DT;
     double Emax = SimulationParam->Emag;
     double *p = SimulationParam->Epulse;
-    SimulationParam->E=Emax*exp(-0.5 * pow((t-p[0])/p[1],2));
-    // printf("WOAH %e %e %e %e %e\n", t, Emax, p[0], p[1], SimulationParam->E);
+    SimulationParam->E = Emax*exp(-0.5*pow((t-p[0])/p[1],2));
 }
 
 unsigned int ReadTime(std::string line) {
