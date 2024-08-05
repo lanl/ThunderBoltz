@@ -208,6 +208,13 @@ class ThunderBoltz(MPRunner):
         self.err_stack = []
         self._proc = None
 
+        # Delete appending output files
+        for f in os.listdir(self.directory):
+            path = pjoin(self.directory, f)
+            if "Counts" in f or "Particle_Type" in f or ("Particle_" in f and "_Dump_" in f):
+                os.remove(path)
+
+
     def get_sim_param(self, key):
         """Return the value of a simulation parameter.
 
@@ -701,7 +708,7 @@ class ThunderBoltz(MPRunner):
         # sending updates
         os.set_blocking(p.stdout.fileno(), False)
 
-        if std_buf: f = open(std_buf, "a", buffering=1)
+        if std_buf: f = open(std_buf, "w", buffering=1)
 
         def run_callbacks():
             lines = p.stdout.readlines()
@@ -1523,15 +1530,14 @@ class ThunderBoltz(MPRunner):
                 _, divs = np.histogram(edf_c.values, bins=bins)
                 dE = divs[1] - divs[0]
                 centers = divs[:-1] + dE/2
-                prefactor=1
                 # Mass of this species
                 m = self.tb_params["MP"][0]
                 if comp == "E":
                     # The speed distribution in units of energy
-                    maxwellian = (lambda e: Ne*dE * e/(3/2*mean_e)**2 * np.exp(-abs(e)/(3/2*mean_e)))
+                    maxwellian = (lambda e: Ne*dE * e/(2/3*mean_e)**2 * np.exp(-abs(e)/(2/3*mean_e)))
                 else:
                     # The 1D Gaussian velocity distribution in units of energy
-                    maxwellian = lambda e: Ne*dE / (3*mean_e) * np.exp(-2/3*abs(e)/mean_e)
+                    maxwellian = lambda e: Ne*dE / (2*mean_e) * np.exp(-3/2*abs(e)/mean_e) / np.sqrt(e)
                 maxw_y = np.vectorize(maxwellian)(centers)
                 ax.plot(centers, maxw_y, label="Maxwellian")
 
