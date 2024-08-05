@@ -17,11 +17,11 @@
 
 /*constants*/
 #define EPS_0 8.85418782e-12  	// F/m, vacuum permittivity
-#define K	1.38065e-23			// J/K, Boltzmann constant
+#define K	1.380649e-23			// J/K, Boltzmann constant
 #define ME 9.10938215e-31		// kg, electron mass
 #define QE 1.602176565e-19		// C, elementary charge
 #define AMU  1.660538921e-27	// kg, atomic mass unit
-#define EV_TO_K	11604.52		// 1eV in Kelvin, QE/K
+#define EV_TO_K	11604.51812550082    // 1eV in Kelvin, QE/K
 #define PI 3.14159265//
 
 #define quiet 0
@@ -128,8 +128,10 @@ struct InputData
 
 /** FUNCTION PROTOTYPES **/
 double rnd();
+double normal(double mu, double std);
 void ReportStatus(Particles *AllParticle, CrossSections *AllCrossSections, InputData *Parameters, int step);
 double SampleVel(double T, double mass);
+void SetVelTemp(Particles *particle_list, InputData *SimulationParam, double T, int type, int axis); /* rescale velocities to match exact temperatures */
 
 // Include in future particle class
 void AddParticle(InputData *SimulationParam, Particles *particle_list,

@@ -88,6 +88,15 @@ double rnd()
     return rnd;
 }
 
+double normal(double mu, double std)
+{
+	static std::random_device random;
+	static std::mt19937_64 generator(random());
+	static std::normal_distribution<double> normal_dist(mu, std);
+	double rnd = normal_dist(generator);
+    return rnd;
+}
+
 /* random number generator for now using built-in but this is not adequate for real simulations*/
 // double rnd()
 // {
@@ -196,9 +205,19 @@ void ReportStatus(Particles *AllParticle, CrossSections *AllCrossSections, Input
 /* samples random velocity from Maxwellian distribution*/
 double SampleVel(double T, double mass)
 {
-    double v_th = sqrt(2*K*T/mass);
-    return v_th*sqrt(2)*(rnd()+rnd()+rnd()-1.5);
+    double sig = sqrt(K*T/mass);
+    double v = sig*normal(0.0, 1.0);
+    return v;
 }
+
+/* samples random velocity from Maxwellian distribution*/
+// double SampleVel(double T, double mass)
+// {
+//     double v_th = sqrt(2*K*T/mass);
+//     return v_th*sqrt(2)*(rnd()+rnd()+rnd()-1.5);
+// }
+
+
 
 void InitializeParticles(Particles *particle_list, InputData *SimulationParam)
 {
@@ -265,6 +284,13 @@ void InitializeParticles(Particles *particle_list, InputData *SimulationParam)
                 // Create particle at 0, 0, 0 position with sampled velocities
                 AddParticle(SimulationParam,particle_list,0,0,0,vx,vy,vz,qp,mp,i,0);
             }
+
+            // Rescale so fit precise temperature.
+            if (tp > 0) {
+                for (int dim = 0; dim < 3; dim++) {
+                    SetVelTemp(particle_list, SimulationParam, tp/EV_TO_K, i, dim);
+                }
+            }
         }
     }
 }
@@ -297,6 +323,27 @@ void AddParticle(InputData *SimulationParam, Particles *particle_list,
     /*increment particle counter*/
     particle_list->np++;
 }
+
+/* rescale velocities to match exact temperatures */
+void SetVelTemp(Particles *particle_list, InputData *SimulationParam, double T, int type, int axis) { 
+    // Compute bias
+    double V = ComputeVelocityMoment(particle_list, type, axis);
+    double dv; // peculiar velocity
+
+    double T_old = ComputeTemperature(particle_list, SimulationParam, type, axis);
+    if (T_old == 0) return;
+
+    for (unsigned long p = 0; p < particle_list->np; p++) {
+        if (particle_list->part[p].type == type) {
+            Particle *part = &particle_list->part[p];
+            dv = part->v[axis] - V;
+            // scale peculiar velocity
+            dv *= sqrt(T/T_old);
+            part->v[axis] = V + dv;
+        }
+    }
+}
+
 
 /* Accelerate Species*/
 void Accelerate(Particles *particle_list, InputData *SimulationParam)

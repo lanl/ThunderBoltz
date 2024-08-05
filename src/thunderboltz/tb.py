@@ -430,8 +430,8 @@ class ThunderBoltz(MPRunner):
         n_gas = tb["NP"][hp["gas_index"]]/tb["L"]**3
 
         # Calculate other derived parameters, if need be
-        if hp["duration"]:
-            tb["NS"] = int(np.ceil((hp["duration"] // tb["DT"])))
+        if hp["duration"] is not None:
+            tb["NS"] = int(np.ceil(hp["duration"] / tb["DT"]))
 
         if hp["Ered"] is not None:
             # Calculate E-field in V/m such that an electron
@@ -832,7 +832,8 @@ class ThunderBoltz(MPRunner):
             :class:`pandas.DataFrame`: The particle data for
             species ``i``.
         """
-
+        # Alias
+        pt = self.particle_tables
         fpath = pjoin(self.directory, f"Particle_Type_{i}.dat")
         with open(fpath, "r") as f:
             column_names = f.readline().replace(",", "").split()
@@ -843,8 +844,12 @@ class ThunderBoltz(MPRunner):
         txt = "".join(lines)
         a = np.genfromtxt(io.StringIO(txt), delimiter=",",
                 autostrip=True, ndmin=2)
-        self.particle_tables[i] = pd.DataFrame(a, columns=column_names)
-        return self.particle_tables[i]
+        pt[i] = pd.DataFrame(a, columns=column_names)
+
+        # Compute aggregate temperature
+        pt[i]["Ti"] = pt[i][["Txi", "Tyi", "Tzi"]].mean(axis=1)
+
+        return pt[i]
 
     def read(self, directory=None, read_input=True, read_cs_data=False, only=None):
         """Read the simulation directory of a ThunderBoltz run, possibly
@@ -921,7 +926,7 @@ class ThunderBoltz(MPRunner):
         if kt is None:
             raise RuntimeError("Missing output logs, make sure stdout and "
                                "particle tables are being written.")
-        if pt == [] or pt[0] is None or (len(pt[0]) < 2 or len(kt) < 2):
+        if pt == [] or pt[0] is None or (len(pt[0]) < 1 or len(kt) < 1):
             # Do not try to join until more data is available
             self.timeseries = pd.DataFrame()
             return self.timeseries
@@ -936,6 +941,8 @@ class ThunderBoltz(MPRunner):
         ts["n_gas"] = self.tb_params["NP"][self.hp["gas_index"]]/ts.L**3
         # Calculate reduced field
         ts.loc[:, "mobN"] = ts.Vzi.abs()/ts.E.abs()*ts.n_gas
+
+        if len(ts) < 2: return ts
 
         # Compute some additional parameters
         self.DT = ts["t"].values[1] - ts["t"].values[0]

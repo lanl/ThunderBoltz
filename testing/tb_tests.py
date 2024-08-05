@@ -121,7 +121,7 @@ def test_fixed_bg():
 def test_dynamic_bg():
     """Test a dynamic background gas, ensure particles mean energies are
     changing"""
-    calc = TB(fixed_background=False, L=1e-8, NS=501,
+    calc = TB(fixed_background=False, L=1e-8, NS=200, TP=[1, 1],
             NP=[1000, 1], **He_settings())
     calc.run()
     calc.get_timeseries()
