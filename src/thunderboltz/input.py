@@ -9,6 +9,7 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import scipy.constants as c
 from scipy.constants import physical_constants as pc
 
 from thunderboltz import parsing
@@ -17,9 +18,6 @@ from thunderboltz.kinetic import Process
 from thunderboltz.plotting import styles
 
 # Physical Constants
-ME = 9.1093837e-31 # electron mass, kg
-QE = 1.60217663e-19 # elementary charge C or J/eV
-AMU_TO_KG = 1.6605e-27 # kg / amu
 a_0 = 5.29177e-11 # Bohr radius in m
 eVRyd = 13.6056980659 # eV per Rydberg
 
@@ -302,7 +300,7 @@ class CrossSections(object):
             pname = csfile.replace(".dat", "") + label
             cs_dat = self.data[csfile]
             x = cs_dat[en]/B - 1 if thresholds else cs_dat[en]
-            cs = (np.sqrt(2*cs_dat[en]*QE/ME)*cs_dat[csn]
+            cs = (np.sqrt(2*cs_dat[en]*c.e/c.m_e)*cs_dat[csn]
                   if vsig else cs_dat[csn])
             ax.plot(x, cs, label=pname, c=color, **plot_args)
 

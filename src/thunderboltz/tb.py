@@ -26,6 +26,8 @@ import pandas as pd
 import scipy.optimize as opt
 from scipy.stats import linregress
 from scipy.integrate import quadrature as quad
+import scipy.constants as c
+from scipy.constants import physical_constants
 
 import thunderboltz as tb
 from thunderboltz.input import CrossSections
@@ -39,9 +41,7 @@ from thunderboltz.plotting.figure_gen import plot_timeseries
 from thunderboltz.plotting.figure_gen import plot_vdfs
 
 # Physical Constants
-ME = 9.1093837e-31 # kg
-QE = 1.60217663e-19 # C or J/eV
-AMU_TO_KG = 1.6605e-27 # kg / amu
+AMU_TO_KG = physical_constants["atomic mass constant"][0] # kg / amu
 
 # Elastic angular distribution function names and parameters
 EADF = {"He_Park": ("Park", [0.283, 0.667, 0.0307, 16.971, 6.59, 29.02, 0.0258, 0.295, 0.00328, 1.794]),
@@ -370,7 +370,7 @@ class ThunderBoltz(MPRunner):
             e, cs = df.values.T
             df["rtype"] = key
             # Calculate vsig(eps) for each cs
-            df["vsig"] = np.sqrt(2*e*QE/mu)*cs
+            df["vsig"] = np.sqrt(2*e*c.e/mu)*cs
             cs_df = pd.concat((cs_df, df), ignore_index=True)
 
         vsig_min_max = np.min(cs_df.groupby("rtype").vsig.agg("max"))
@@ -378,7 +378,7 @@ class ThunderBoltz(MPRunner):
         # Convert reduced field to Vm^2
         EoN = 1e-21*hp["Ered"]
         # Condition: only accelerate EP_0 electrons a max of DE each step
-        Ne = hp["Nmin"]*np.sqrt(2*QE*hp["EP_0"]/ME)*2*QE*EoN/(QE*hp["DE"]*vsig_min_max)
+        Ne = hp["Nmin"]*np.sqrt(2*c.e*hp["EP_0"]/c.m_e)*2*c.e*EoN/(QE*hp["DE"]*vsig_min_max)
 
         # Take maximum of current number of particles with this condition
         Ne = max(Ne, tb["NP"][0]*tb["NP"][1])
@@ -391,7 +391,7 @@ class ThunderBoltz(MPRunner):
         n_gas = tb["NP"][hp["gas_index"]]/tb["L"]**3
         tb["E"] = EoN*n_gas
         # Compute DT with E, EP_0, DE
-        tb["DT"] = QE*hp["DE"]/(QE*tb["E"]) * np.sqrt(ME/(2*QE*hp["EP_0"]))
+        tb["DT"] = c.e*hp["DE"]/(c.e*tb["E"]) * np.sqrt(c.m_e/(2*QE*hp["EP_0"]))
 
         # Scale individual parameters beyond calibrated values.
         # Note, this will break E/N initial condition
@@ -1263,18 +1263,22 @@ class ThunderBoltz(MPRunner):
                 file for very large files. Default is 500000. If bool(sample_cap)
                 evaluates to ``False``, then no cap will be imposed.
 
+        Raises:
+            RuntimeError: if no VDF data can be found.
+
         Returns:
             :class:`pandas.DataFrame`: A table with the signed and unsigned
                 energy components of each particle.
         """
 
         self.get_vdfs(steps, sample_cap)
+        if self.vdfs is None: raise RuntimeError("No velocity data found.")
         edf = self.vdfs.copy().rename(
             columns={k: k.replace("v", "E") for k in self.vdfs.columns[1:]})
         # Transform columns to eV, first signed energies
         m = self.tb_params["MP"][0]*AMU_TO_KG
         for col in ["Ex", "Ey", "Ez"]:
-            edf[col+"_signed"] = 1/2 * m/QE * edf[col] * edf[col].map(np.abs)
+            edf[col+"_signed"] = 1/2 * m/c.e * edf[col] * edf[col].map(np.abs)
         # Then the unsigned
         for col in ["Ex", "Ey", "Ez"]:
             edf[col] = edf[col+"_signed"].abs()
@@ -1489,7 +1493,7 @@ class ThunderBoltz(MPRunner):
 
         # XXX: For now, it is assumed that only VDFs for electrons exist.
 
-        edfs = self.get_edfs(steps="last", sample_cap=500000)
+        edfs = self.get_edfs(steps=steps, sample_cap=sample_cap)
         # Save pretty component names
         xlabels = [r"$\e" + f"psilon{c}$ (eV)" for c in ["_x", "_y", "_z", r"_{\rm tot}"]]
         figs = []
@@ -1573,7 +1577,7 @@ class ThunderBoltz(MPRunner):
             save (bool): Optional location of directory to save the figure in.
 
         Returns:
-            (Tuple[list[matplotlib.figure.Figure], list[int]): The list of
+            (Tuple[list[matplotlib.figure.Figure]], list[int]): The list of
             figures and a list of their corresponding step indices.
 
         Note:
@@ -1623,7 +1627,7 @@ class ThunderBoltz(MPRunner):
             save (str): Optional location of directory to save the figure in.
 
         Returns:
-            (Tuple[list[matplotlib.figure.Figure], list[int]): The list of
+            (Tuple[list[matplotlib.figure.Figure]], list[int]): The list of
             figures and a list of their corresponding step indices.
         """
         # Check whats available out of the requested

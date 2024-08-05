@@ -8,6 +8,7 @@ import shutil
 import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.constants as c
+from scipy.constants import physical_constants
 
 import pickle
 import thunderboltz as tb
@@ -17,9 +18,7 @@ from thunderboltz.parallel import DistributedPool
 import visualize
 
 # Physical Constants
-ME = 9.1093837e-31 # kg
-QE = 1.60217663e-19 # C or J/eV
-AMU_TO_KG = 1.6605e-27 # kg / amu
+AMU_TO_KG = physical_constants["atomic mass constant"][0] # kg / amu
 
 def onsager_relation():
     """Test a simple system with a closed-form equilibrium condition and

@@ -12,15 +12,13 @@ import numpy as np
 from numpy import vectorize as vec
 import seaborn as sns
 import scipy
+import scipy.constants as c
+from scipy.constants import physical_constants
 
 from thunderboltz import parameters
 from thunderboltz import parsing
 from thunderboltz.plotting import pdplot
 from thunderboltz.plotting import styles
-
-ME = 9.1093837e-31 # kg
-QE = 1.60217663e-19 # C or J/eV
-AMU_TO_KG = 1.6605e-27 # kg / amu
 
 def plot_timeseries(fig, ts, series=["MEe", "mobN", "a_n"], save=None):
     """Plot ThunderBoltz output values as function of time."""

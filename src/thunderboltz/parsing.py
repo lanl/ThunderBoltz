@@ -236,6 +236,12 @@ def extract_vdfs(calc_dir, steps="all", sample_cap=500000,
             file for very large files. Default is 500000. If bool(sample_cap)
             evaluates to ``False``, then no cap will be imposed.
         v (int): Verbosity -- 0: silent, 1: print file paths before reading.
+        particle_type (str, list[int], or int): Specify which kinds of species data
+            should be read from.
+
+            * ``int``: The particle type to read. Default is ``0``.
+            * ``list[int]``: A set of particle types to read.
+            * ``"all"``: Read all particle types.
 
     Returns:
         :class:`pandas.DataFrame`: The velocity distributions function sample

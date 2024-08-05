@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
+import scipy.constants as c
 
 import thunderboltz as tb
 from thunderboltz import ThunderBoltz as TB
@@ -162,7 +163,7 @@ def test_reduced_params():
     proper units."""
     # First with two species
     # Default charge and mass parameters
-    p = {"QE": [-1, 0], "ME": [1, 1]}
+    p = {"QP": [-1, 0], "MP": [1, 1]}
     L = 1e-6
     calc = TB(NP=[1, 2], L=L, Ered=2, Bred=[0, 2.5, 0], **p)
     n = 2/L**3
@@ -171,7 +172,7 @@ def test_reduced_params():
     # Enforce the conversion B_i[Tesla] = 1e-27*(B/n)[Hx]*n[m^-3]
     assert abs(calc.tb_params["B"][1]) == 1e-27*2.5*n
     # Now with one species
-    p = {"QE": [-1], "ME": [1]}
+    p = {"QP": [-1], "MP": [1]}
     L = 1e-6
     calc = TB(NP=[2], L=L, Ered=2, Bred=[0, 2.5, 0], **p)
     n = 2/L**3

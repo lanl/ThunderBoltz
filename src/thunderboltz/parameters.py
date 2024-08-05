@@ -32,8 +32,8 @@ class TBParameters(Parameters):
     #: (list[float]) Mass of each particle species (amu),
     #: default is ``[5.4857e-4, 28.0]``.
     MP=[5.4857e-4, 28.0]
-    #: (int) Number of time steps, default is ``1000001``.
-    NS=1000001
+    #: (int) Number of time steps, default is ``1000000``.
+    NS=1000000
     #: (int) Number of random samples used to find
     #: :math:`\max_\epsilon (v\sigma(\epsilon))` for each process,
     #: default is ``1000``.

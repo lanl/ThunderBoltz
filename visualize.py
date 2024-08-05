@@ -225,12 +225,11 @@ def plot_onsager():
 
     # Generate the theoretical rates
     AMU_TO_KG = 1.6605e-27 # kg / amu
-    QE = 1.60217663e-19 # C or J/eV
     mr = AMU_TO_KG * (14. / 2)
     kbT = 1.
     # the rate formula in terms of cross section area, activation energy
-    kf = lambda A, Ea: A*np.sqrt(8*kbT*QE/(np.pi*mr)) * np.exp(-Ea/kbT)
-    kr = lambda A: A*np.sqrt(8*kbT*QE/(np.pi*mr))
+    kf = lambda A, Ea: A*np.sqrt(8*kbT*c.e/(np.pi*mr)) * np.exp(-Ea/kbT)
+    kr = lambda A: A*np.sqrt(8*kbT*c.e/(np.pi*mr))
     analytic_ks = {
         (1, 2): kf(1e-20, 1.),
         (2, 1): kr(1e-20),
