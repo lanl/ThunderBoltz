@@ -1671,6 +1671,167 @@ class ThunderBoltz(MPRunner):
             steps.append(step)
         return figs, steps
 
+    def plot_speed_dist(self, steps="last", save=None, bins=100,
+            sample_cap=500000, particle_type=0):
+        """Plot the speed distribution of electrons.
+
+        Args:
+            steps (str, list[int], or int): Options for which time steps to
+                read:
+
+                * ``"last"``: Only read the VDF of the last time step
+                * ``"first"``: Only read the VDF of the first time step
+                * ``"all"``: Read a separate VDF for each time step.
+                * ``list[int]``: Read VDF for each time step included in list.
+                * ``int``: read VDF at one specific time step.
+
+            sample_cap (int): Limit the number of samples read from the dump
+                file for very large files. Default is 500000. If bool(sample_cap)
+                evaluates to ``False``, then no cap will be imposed.
+            bins (int): Total number of bins to divide the energy space into.
+            save (str): Optional location of directory to save the figure in.
+            particle_type (str, list[int], or int): Specify which kinds of species data
+                should be read from.
+
+                * ``int``: The particle type to read. Default is ``0``.
+                * ``list[int]``: A set of particle types to read.
+                * ``"all"``: Read all particle types.
+
+        Returns:
+            (Tuple[list[matplotlib.figure.Figure]], list[int]): The list of
+            figures and a list of their corresponding step indices.
+        """
+        vnames = ["vx", "vy", "vz"]
+        Vnames = ["Vxi", "Vyi", "Vzi"]
+        ts = self.get_timeseries()
+        pt = self.get_particle_tables()
+        vdfs = self.get_vdfs(
+            steps=steps, sample_cap=sample_cap, particle_type=particle_type)
+        # print(vdfs)
+        # print(speed)
+        figs = []
+        ids = []
+        for (ptype, step), vdf in vdfs.groupby(["ptype", "step"]):
+            ts_step = ts[ts["step"] == step]
+            pt_step = pt[ptype][ts["step"] == step]
+
+            # Calculate peculiar velocity
+            dv = vdf[vnames] - ts_step[Vnames].to_numpy()
+
+            T = pt_step["Ti"].to_numpy()[0] # eV
+
+            speed = np.sqrt((dv**2).sum(axis=1))
+
+            fig, ax = plt.subplots()
+            speed.plot.hist(ax=ax, bins=bins, density=True)
+            ax.set_title(f"species: {ptype}, step: {step}")
+            ax.set_xlabel("Speed (m/s)")
+            ax.set_ylabel("Density (s/m/N$_{p}$)")
+
+            # counts, divs = np.histogram(speed, bins=bins, density=True)
+            # vals = (divs[1:] + divs[:-1])/2
+            # ax.plot(vals, counts)
+
+            # Plot Maxwellian speed distribution 
+            
+            # Plot Maxwellian speed distribution
+            m = self.tb_params["MP"][ptype] * AMU_TO_KG
+
+            def maxwellian_speed(v):
+                return (m/(2*np.pi*c.e*T))**(3/2) * 4*np.pi*v**2 * np.exp(-m*v**2/(2*c.e*T))
+            v_sample = np.linspace(0, speed.max(), 2000)
+            ax.plot(v_sample, maxwellian_speed(v_sample))
+
+            if save:
+                sname = Path(self.directory).parts[-1]
+                if not os.path.isdir(save): os.makedirs(save)
+                saveas = pjoin(save, sname+f"_speed_dist.pdf")
+                print(f"Saving speed distribution plot in {saveas}", flush=True)
+                fig.savefig(saveas)
+                plt.close(fig)
+
+            fig.tight_layout()
+            figs.append(fig)
+            ids.append((ptype, step))
+
+        return figs, ids
+
+    def compute_non_maxwellian(self, steps="last", bins=100, particle_type=0, sample_cap=500000):
+        r"""Compute the ratio
+        :math:`\alpha_f = \sum_{b=1}^{N_{b}}
+        :math:`\abs{\frac{f\p{\vec{v}_{b}} - f_\mathrm{M}\p{\vec{v}_{b}}}{f_\mathrm{M}\p{\vec{v}_{b}}}}`
+        :math:`\Delta^{3} \vec{v}` to quantify non-mawellian properties of the distribution.
+
+        Args:
+            steps (str, list[int], or int): Options for which time steps to
+                read:
+
+                * ``"last"``: Only read the VDF of the last time step
+                * ``"first"``: Only read the VDF of the first time step
+                * ``"all"``: Read a separate VDF for each time step.
+                * ``list[int]``: Read VDF for each time step included in list.
+                * ``int``: read VDF at one specific time step.
+
+            bins (int): Total number of bins to divide the energy space into.
+            particle_type (str, list[int], or int): Specify which kinds of species data
+                should be read from.
+
+                * ``int``: The particle type to read. Default is ``0``.
+                * ``list[int]``: A set of particle types to read.
+                * ``"all"``: Read all particle types.
+
+            sample_cap (int): Limit the number of samples read from the dump
+                file for very large files. Default is 500000. If bool(sample_cap)
+                evaluates to ``False``, then no cap will be imposed.
+        """
+        vdfs = self.get_vdfs(particle_type=particle_type, sample_cap=sample_cap)
+
+        v_names = ["vx", "vy", "vz"]
+        V_names = ["Vxi", "Vyi", "Vzi"]
+
+        ts = self.get_timeseries()
+        pt = self.get_particle_tables()
+        vdfs = self.get_vdfs(
+            steps=steps, sample_cap=sample_cap, particle_type=particle_type)
+
+        figs = []
+        ids = []
+        for (ptype, step), vdf in vdfs.groupby(["ptype", "step"]):
+            ts_step = ts[ts["step"] == step]
+            pt_step = pt[ptype][ts["step"] == step]
+
+            # Calculate peculiar velocity
+            vpec = vdf[v_names].to_numpy() - ts_step[V_names].to_numpy()
+            f_v, (divx, divy, divz) = np.histogramdd(vpec, density=True, bins=bins)
+            cx = (divx[1:] + divx[:-1])/2
+            cy = (divy[1:] + divy[:-1])/2
+            cz = (divz[1:] + divz[:-1])/2
+            VX, VY, VZ = np.meshgrid(cx, cy, cz)
+
+
+            # Bin volume
+            dV = np.abs((divx[1]-divx[0])*(divy[1]-divy[0])*(divz[1]-divz[0]))
+        
+            # Use total temperature
+            T = pt_step["Ti"].to_numpy()[0] # eV
+            m = self.tb_params["MP"][ptype] * AMU_TO_KG
+            # Calculate corresponding 3D Maxwellian
+            max_ = lambda X, Y, Z: (1/(2*np.pi*c.e*T/m)**(3/2)
+                * np.exp(-m/(2*c.e*T) * (X**2+Y**2+Z**2)))
+
+            f_m = (1/(2*np.pi*c.e*T/m)**(3/2)
+                * np.exp(-m/(2*c.e*T) * (VX**2+VY**2+VZ**2)))
+
+            # Too noisy
+            # split = bins // 2
+            # plt.plot(max_(VX[:,split,split], VY[:,split,split], VZ[:,split,split]), label="maxwellian")
+            # plt.plot(f_v[:,split,split], label="particles")
+            # plt.show()
+
+            alpha_f = (np.abs((f_v - f_m)/f_m)).mean()
+            return alpha_f
+
+
     def plot_cs(self, ax=None, legend=True, vsig=False,
                 thresholds=False, save=None, **plot_args):
         r"""Plot the cross sections models.

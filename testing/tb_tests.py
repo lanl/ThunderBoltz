@@ -823,8 +823,39 @@ def test_ExB():
 
 def test_E_pulse():
     """Create a Gaussian model of an E field pulse."""
-    calc = TB(NS=3000, DT=1e-10, OS=10, EP=[2e-7, 1e-8], **He_settings())
+    calc = TB(NS=400, DT=1e-10, OS=10, EP=[2e-9, 1e-10], **He_settings())
     calc.run()
-    calc.plot_timeseries(series=["E", "k_ion", "k_8"])
+    calc.plot_timeseries(series=["E", "k_i", "k_8"])
     ts = calc.get_timeseries()
     # assert len(ts) == 4
+
+def test_0_temp_scale():
+    """Ensure temp scale works correctly in case of TP=0"""
+    calc = TB(NS=0, DT=1e-10, OS=10, FV=[[0, 0, 0], [1, 0, 0]], **He_settings())
+    calc.run()
+    vdfs = calc.get_vdfs()
+    assert not vdfs[["vx", "vy", "vz"]].isna().any().any()
+
+def test_speed_dist():
+    calc = TB(NS=0, NP=[1e7, 1e7], TP=[100, 1], DT=1e-10, OS=10, FV=[[0, 0, 0], [0, 0, 1]], **He_settings())
+
+    calc.run()
+    calc.plot_speed_dist(steps="first", particle_type="all")
+
+def test_non_max():
+    """Compute nonmaxwellian index."""
+    calc = TB(NS=0, NP=[1e5, 1e5], TP=[100, 100], DT=1e-10, OS=10, FV=[[0, 0, 0], [0, 0, 1]], **He_settings())
+
+    nmxs = []
+    NPs = [1e3, 1e5, 1e7]
+    NPs = [1e8]
+    for NP in NPs:
+        print(NP)
+        calc.set_(NP=[NP, NP])
+        calc.run()
+        nmxs.append(calc.compute_non_maxwellian(steps="first", particle_type="all", bins=100))
+        calc.reset()
+
+    plt.plot(NPs, nmxs)
+    plt.xscale("log")
+    plt.show()
