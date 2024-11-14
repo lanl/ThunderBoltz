@@ -17,8 +17,8 @@ commonly used Boltzmann solvers such as Bolsig+ or MagBoltz since these solvers 
 track electron transport (either via trajectories in the MC case, or through modeling
 of the EEDF) due to collisions with a stationary neutral background.
 
-To reference this code and work, please cite the arXiv article:
-https://arxiv.org/abs/2310.07913
+To reference this code and work, please cite the [article](https://iopscience.iop.org/article/10.1088/1361-6595/ad6fcc):
+Ryan Park *et al* 2024 Plasma Sources Sci. Technol. 33 095007.
 
 ## Documentation 
 The ThunderBoltz C++ source code manual is found in the home directory
@@ -88,7 +88,7 @@ cd example_sim
 # Copy the source over
 cp ../src/thunderboltz/cpp/* .
 # Copy example input files over
-cp -r ../indecks/N2/* .
+cp -r ../indecks/ac_field/* .
 # Compile
 g++ -std=c++17 -o thunderboltz.bin DSMC0D.cpp
 # Run
@@ -140,9 +140,7 @@ for more details.
 
 ## Roadmap
 - Regression testing of internal ThunderBoltz code
-- Diffusion post processing
 - Random deletion after ionization option
 - Addition of photon transport
-- Optional particle reweigting
-
-
+- Optional particle re-weigting
+- Disorder-induced heating
