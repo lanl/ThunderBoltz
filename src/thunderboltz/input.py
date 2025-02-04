@@ -334,18 +334,28 @@ class CrossSections(object):
             s += f"CS {cspath} {description}"
         return s
 
-    def from_LXCat(self, fname):
-        """Load cross section data from an LXCat .txt file"""
+    def from_LXCat(self, fname, filter_map=None):
+        """Load cross section data from an LXCat .txt file.
+
+        Args:
+            fname (str): Path name of the LXCat .txt file.
+            filter_map (str): Option to only include one target species.
+                Default is ``None``.
+        """
         if not os.path.exists(fname):
             raise IOError(f"LXCat file {fname} does not exist.")
         if self.data or len(self.table):
             raise RuntimeError(f"LXCat file was passed when cross section "
                                 "data already exists")
         df = parsing.read_LXCat_cs(fname)
+        # Apply filters
+        if filter_map is not None:
+            df = df[df.apply(filter_map, axis=1)].copy()
+
         # Loop through each process
         for process_string, pdf in df.groupby("process_string"):
             # Derive the names of each process from the process string
-            name = process_string.replace(" ", "")
+            name = process_string.replace(" ", "").replace(os.sep, "_")
             # TODO: implement LXCat species interpretation for TB species indexing
             # parse_process_string(name)
             # Make sure the threshold matches
@@ -363,6 +373,7 @@ class CrossSections(object):
             if ptype not in lxcat_map:
                 raise NotImplementedError(f"There is no current {ptype} "
                         "process implemented in ThunderBoltz")
+
             self.add_process(Process(lxcat_map[ptype],
                 0, 1, 0, 1, threshold=B, cs_data=cs_dat, name=name))
 

@@ -943,7 +943,7 @@ class ThunderBoltz(MPRunner):
         ts["Rzi"] = ts.Rzi
 
         # Reaction rates
-        self._calculate_rates()
+        ts = self.timeseries = self._calculate_rates()
         # Diffusion rates
         self._calculate_diffusion()
         # Bulk swarm flows / reaction rates
@@ -1002,13 +1002,18 @@ class ThunderBoltz(MPRunner):
             ts.loc[:npoints,"k_tot_std"] = k_scale.values*tot_std.values
         
         # Generate rates for all processes individually
+        rate_dict = {}
         for i, row in ctab.iterrows():
             k_scale = 1/(pt[row.r1].Ni*pt[row.r2].Ni*ts.L**3)[:npoints]
             k_scale[k_scale == np.inf] = 0
-            ts.loc[:npoints,f"k_{i+1}"] = k_scale.values*dcdt.iloc[:npoints,i].values
+            rate_dict[f"k_{i+1}"] = k_scale.values*dcdt.iloc[:npoints,i].values
             if std:
                 # Compute std data per process
-                ts.loc[:npoints,f"k_{i+1}_std"] = k_scale.values*c_std.iloc[:npoints,i].values
+                rate_dict[f"k_{i+1}_std"] = k_scale.values*c_std.iloc[:npoints,i].values
+
+        ts = pd.concat([ts, pd.DataFrame(rate_dict)], ignore_index=True)
+
+        return ts
 
     def _calculate_bulk_rates(self, ts=None, ddt=None, std=False):
         """Calculate the bulk flow rates and the associated bulk
@@ -1068,8 +1073,7 @@ class ThunderBoltz(MPRunner):
             RV = ts[f"{axis}V{axis}"]
             ts[f"D_{axis}{axis}"] = RV - R*V
 
-            if std:
-                ts[f"D_{axis}{axis}_bulk_std"] = dii_std
+            if std: ts[f"D_{axis}{axis}_bulk_std"] = dii_std
 
         # Compute hall diffusion
         # fig, ax = plt.subplots()
@@ -1077,8 +1081,7 @@ class ThunderBoltz(MPRunner):
         ts["D_H_bulk"] = dh
         ts["D_H"] = ts["XVZ"] + ts["ZVX"] - ts["Rxi"]*ts["Vzi"] - ts["Rzi"]*ts["Vxi"]
 
-        if std:
-            ts["D_H_bulk_std"] = dh_std
+        if std: ts["D_H_bulk_std"] = dh_std
 
     def get_ss_params(self, ss_func=None, fit=False):
         """Get steady-state transport parameter values by averaging last section
@@ -1143,7 +1146,7 @@ class ThunderBoltz(MPRunner):
 
         if fit:
             # Recalculate using fit method for time derivative calculations
-            self._calculate_rates(ts_last, ddt=self.compute_fit, std=True)
+            ts_last = self._calculate_rates(ts_last, ddt=self.compute_fit, std=True)
             self._calculate_diffusion(ts_last, ddt=self.compute_fit, std=True)
             self._calculate_bulk_rates(ts_last, ddt=self.compute_fit, std=True)
 

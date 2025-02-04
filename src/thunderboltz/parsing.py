@@ -29,7 +29,7 @@ def read_LXCat_cs(efile):
     db_end = lambda l: "x"*10 in l
     # Target block start and exit
     tg_start = lambda l: "*"*58 + " " in l
-    tg_end = lambda l: "*"*80 in l
+    tg_end = lambda l: "*"*80 in l or "*"*58 + " " in l
     # Process block start
     p_start = lambda l: l.rstrip() in ptypes
     def goto(l, *conditions):
@@ -41,11 +41,12 @@ def read_LXCat_cs(efile):
     def read_L3(d, l):
         """Interpret the special third line of the LXCat format."""
         s = l.split()
-        if len(s) > 1 and ": " not in l:
+        if len(s) > 1 and ": " not in l and d["process_type"] not in ["ELASTIC", "EFFECTIVE"]:
             # This must be an excitation with a population ratio
             d["threshold"] = float(s[0])
             d["weight_ratio"] = float(s[1])
             l = f.readline()
+
         elif d["process_type"] == "ATTACHMENT":
             # 3rd line is omitted
             pass
@@ -54,7 +55,7 @@ def read_LXCat_cs(efile):
             pass
         elif d["process_type"] in ["ELASTIC", "EFFECTIVE"]:
             # 3rd line is the ratio between the electron and target mass
-            d["target_mass_ratio"] = float(l.rstrip())
+            d["target_mass_ratio"] = float(s[0])
             l = f.readline()
         else:
             # 3rd line is the threshold value
@@ -115,6 +116,11 @@ def read_LXCat_cs(efile):
                     l = goto(l, p_start, tg_end, db_end)
                 l = goto(l, tg_start, db_end)
             l = goto(l, db_start, EOF)
+
+    # Ensure comments are strings
+    if "comment" in df:
+        df.comment = df.comment.astype(str)
+
     return df
 
 def get_cs_defaults(infile):

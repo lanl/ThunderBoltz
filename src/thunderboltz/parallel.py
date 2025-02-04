@@ -80,13 +80,15 @@ class DistributedPool(object):
     Args:
         runner (MPRunner): The calculation runner.
         processes (int): The number of cores to divide up the work.
+        serial (bool): Option to bypass parallelism e.g. for testing.
     """
 
-    def __init__(self, runner: MPRunner, processes=None):
+    def __init__(self, runner: MPRunner, processes=None, serial=False):
         # Always use the fork context
         mpc = mp.get_context("fork")
         self.runner = runner
         self.pool = mpc.Pool(processes=processes)
+        self.serial = serial
 
     def submit(self, run_args={}, **set_args):
         """Submit a single job with updated key words to the pool.
@@ -104,10 +106,14 @@ class DistributedPool(object):
         self.runner_child = copy.deepcopy(self.runner)
         # Keyword args will be sent to the set function
         self.runner_child.set_(**set_args)
+
         # run_args are sent separately with the caller
-        self.pool.apply_async(
-            self.runner_child.run, (), run_args,
-            error_callback=self.err_callback)
+        if not self.serial:
+            self.pool.apply_async(
+                self.runner_child.run, (), run_args,
+                error_callback=self.err_callback)
+        else:
+            self.runner_child.run(**run_args)
 
     def __enter__(self):
         """Pipe the context input back to caller."""
