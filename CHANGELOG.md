@@ -2,6 +2,17 @@
 
 
 
+## v0.4.3 (2025-08-20)
+
+### Chore
+
+* chore: update poetry lock ([`3fbd379`](https://github.com/lanl/ThunderBoltz/commit/3fbd379014ab962745625174ae86e9e04df6802c))
+
+### Fix
+
+* fix: Limit mpl to avoid further deprecations ([`91213ae`](https://github.com/lanl/ThunderBoltz/commit/91213ae587ed4ca4c040e3c24f97840b98db4668))
+
+
 ## v0.4.2 (2025-08-20)
 
 ### Documentation
