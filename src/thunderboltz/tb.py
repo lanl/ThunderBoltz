@@ -25,7 +25,6 @@ import numpy as np
 import pandas as pd
 import scipy.optimize as opt
 from scipy.stats import linregress
-from scipy.integrate import quadrature as quad
 
 import thunderboltz as tb
 from thunderboltz.input import CrossSections
