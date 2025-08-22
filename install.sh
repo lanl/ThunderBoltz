@@ -19,7 +19,7 @@ else
     echo "Aborting - installation occured outside of setup directory"
 fi
 # Build and remove build tmp backend
-pip install --user .
+pip install --user -e .
 if test -d "build"; then
     rm -r build
 fi
