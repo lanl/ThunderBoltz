@@ -2,6 +2,20 @@
 
 
 
+## v0.4.4 (2025-08-28)
+
+### Chore
+
+* chore: -e option in git install for patch develop ([`e259677`](https://github.com/lanl/ThunderBoltz/commit/e25967701bef5dd7c524f5663635005e1ed33b04))
+
+### Fix
+
+* fix: move Werror to debug only.
+
+Werror seems to be too strict for early distribution onto new systems.
+It&#39;s behavior changes. ([`611a574`](https://github.com/lanl/ThunderBoltz/commit/611a574175334d2654c58c47aa09b6743773eae2))
+
+
 ## v0.4.3 (2025-08-20)
 
 ### Chore
