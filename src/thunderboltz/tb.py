@@ -25,7 +25,6 @@ import numpy as np
 import pandas as pd
 import scipy.optimize as opt
 from scipy.stats import linregress
-from scipy.integrate import quadrature as quad
 
 import thunderboltz as tb
 from thunderboltz.input import CrossSections
@@ -552,7 +551,7 @@ class ThunderBoltz(MPRunner):
         os.chdir(self.directory)
 
         # Compile (hard-coded for security reasons).
-        cmd = "g++ -std=c++17 DSMC0D.cpp -o thunderboltz.bin -Wall -Werror -Wsign-compare"
+        cmd = "g++ -std=c++17 DSMC0D.cpp -o thunderboltz.bin -Wall -Wsign-compare"
         # Debug
         if debug:
             cmd = "g++ -g -std=c++17 DSMC0D.cpp -o thunderboltz.debug -Wall -Werror -Wsign-compare"

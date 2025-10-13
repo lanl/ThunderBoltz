@@ -2,6 +2,48 @@
 
 
 
+## v0.4.4 (2025-08-28)
+
+### Chore
+
+* chore: -e option in git install for patch develop ([`e259677`](https://github.com/lanl/ThunderBoltz/commit/e25967701bef5dd7c524f5663635005e1ed33b04))
+
+### Fix
+
+* fix: move Werror to debug only.
+
+Werror seems to be too strict for early distribution onto new systems.
+It&#39;s behavior changes. ([`611a574`](https://github.com/lanl/ThunderBoltz/commit/611a574175334d2654c58c47aa09b6743773eae2))
+
+
+## v0.4.3 (2025-08-20)
+
+### Chore
+
+* chore: update poetry lock ([`3fbd379`](https://github.com/lanl/ThunderBoltz/commit/3fbd379014ab962745625174ae86e9e04df6802c))
+
+### Fix
+
+* fix: Limit mpl to avoid further deprecations ([`91213ae`](https://github.com/lanl/ThunderBoltz/commit/91213ae587ed4ca4c040e3c24f97840b98db4668))
+
+
+## v0.4.2 (2025-08-20)
+
+### Documentation
+
+* docs: update README with article
+
+and fix the example with out of date directory. ([`21cf69c`](https://github.com/lanl/ThunderBoltz/commit/21cf69cf1dc331476318d97d6cd6967e1470bdb9))
+
+### Fix
+
+* fix: Remove redundant import for python 3.10 ([`ed71d11`](https://github.com/lanl/ThunderBoltz/commit/ed71d118e1fc2dd4b46108d597c6f70376ad3502))
+
+### Unknown
+
+* doc: update diffusion docs in api manual ([`6fe8a12`](https://github.com/lanl/ThunderBoltz/commit/6fe8a124aa1375d329804cbdc00e5150b3990891))
+
+
 ## v0.4.1 (2024-07-19)
 
 ### Fix

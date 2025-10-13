@@ -19,9 +19,9 @@ else
     echo "Aborting - installation occured outside of setup directory"
 fi
 # Build and remove build tmp backend
-pip install --user .
+pip install --user -e .
 if test -d "build"; then
     rm -r build
 fi
 # Compile from source into bin
-g++ -std=c++17 src/thunderboltz/cpp/DSMC0D.cpp -o bin/thunderboltz.bin -Wall -Werror -Wsign-compare
+g++ -std=c++17 src/thunderboltz/cpp/DSMC0D.cpp -o bin/thunderboltz.bin -Wall -Wsign-compare
