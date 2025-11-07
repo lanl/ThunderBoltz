@@ -1731,6 +1731,7 @@ class ThunderBoltz(MPRunner):
         """Add params to DataFrame."""
         # Log inputs into table format
         for p, v in self.tb_params.items():
+            if p in df: continue
             if isinstance(v, list):
                 df[p] = None # Init column to avoid type error
                 df.loc[:, p] = " ".join(str(t) for t in v)
