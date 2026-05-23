@@ -24,11 +24,11 @@ def test_simple_mp():
     """Run a simple He calculation with different inputs
     across all the cores of the computer."""
     # Get number of cores
-    cores = mp.cpu_count()
+    cores = mp.cpu_count()-1
     # Specify a set of reduced field values
     Efields = 10 + np.arange(cores)*10
     # Create a base TB object
-    calc = TB(NS=1001, **He_settings())
+    calc = TB(NS=1000, **He_settings())
     # Open up a multiprocessing context with this ThunderBoltz object
     with DistributedPool(calc) as pool: # Loop through the conditions
         for field in Efields:
@@ -40,7 +40,8 @@ def test_simple_mp():
     calcs = tb.query_tree(p)
     tss = pd.concat([c.get_timeseries() for c in calcs], ignore_index=True)
     # Ensure all the steps of all processes get collected from reader
-    assert len(tss) == 11*cores
+    print(len(tss), 10*cores)
+    assert len(tss) == 10*cores
 
 def test_slurm_submission():
     """Run a simple slurm script through the SlurmManager."""

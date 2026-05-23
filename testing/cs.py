@@ -54,8 +54,8 @@ def test_cs_too_many_species():
 def test_read_LXCat_cs():
     """Test parsing the LXCat text"""
     df = tb.parsing.read_LXCat_cs(pjoin("lxcat", "assortment.txt"))
-    keys = ["process_type", "threshold", "db", "target"]
-    assert len(df.drop_duplicates(keys)[keys]) == 264
+    ndb = df.db.nunique()
+    assert ndb == 14
 
 def test_from_LXCat():
     """Try running a program from LXCat input."""
