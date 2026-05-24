@@ -1010,7 +1010,10 @@ class ThunderBoltz(MPRunner):
                 # Compute std data per process
                 rate_dict[f"k_{i+1}_std"] = k_scale.values*c_std.iloc[:npoints,i].values
 
-        ts = pd.concat([ts, pd.DataFrame(rate_dict)], ignore_index=True)
+        rate_df = pd.DataFrame(rate_dict)
+        new_columns = list(ts.columns) + list(rate_df)
+        ts = pd.concat([ts, rate_df], axis=1, ignore_index=True)
+        ts = ts.rename(columns={a: b for a, b in zip(list(ts.columns), new_columns)})
 
         return ts
 

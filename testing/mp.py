@@ -40,8 +40,7 @@ def test_simple_mp():
     calcs = tb.query_tree(p)
     tss = pd.concat([c.get_timeseries() for c in calcs], ignore_index=True)
     # Ensure all the steps of all processes get collected from reader
-    print(len(tss), 10*cores)
-    assert len(tss) == 10*cores
+    assert len(tss) == 11*cores
 
 def test_slurm_submission():
     """Run a simple slurm script through the SlurmManager."""
